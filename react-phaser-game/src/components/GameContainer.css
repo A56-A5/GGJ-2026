@@ -1,0 +1,18 @@
+.game-container {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background-color: #1a1a1a;
+}
+
+.phaser-game {
+  width: 100%;
+  height: 100%;
+}
+
+/* Ensure Phaser canvas fills container */
+.phaser-game canvas {
+  display: block;
+  margin: 0 auto;
+}
