@@ -21,6 +21,7 @@ export class VillageScene extends Phaser.Scene {
     this.playerController = null
     this.houseManager = null
     this.interactionManager = null
+    this.storeUnsubscribe = null // For cleanup
   }
 
   preload() {
@@ -61,7 +62,7 @@ export class VillageScene extends Phaser.Scene {
     this.interactionManager.create()
 
     // Listen for store changes to update house visuals (e.g. infected status)
-    useGameStore.subscribe((state) => {
+    this.storeUnsubscribe = useGameStore.subscribe((state) => {
       // Ideally we would update house sprites here
       // For now, simpler implementation: scene restart or simple update loop?
       // Let's stick to update loop handling visual updates if needed
@@ -70,27 +71,35 @@ export class VillageScene extends Phaser.Scene {
       // Requirement: "One of the houses will be showing the indicator of yellow or exclamation mark"
       // We can handle this in InteractionManager or HouseManager update
     })
+
+    // Register cleanup on scene shutdown and destroy
+    this.events.on('shutdown', this.cleanup, this)
+    this.events.once('destroy', this.cleanup, this)
   }
 
   update() {
-    try {
-      // Freeze gameplay when an overlay is open
-      if (useGameStore.getState().isPaused) {
-        this.playerController?.stop()
-        return
-      }
+    // Freeze gameplay when an overlay is open
+    if (useGameStore.getState().isPaused) {
+      this.playerController?.stop()
+      return
+    }
 
-      // Update player movement
-      if (this.playerController) {
-        this.playerController.update()
-      }
+    // Update player movement
+    if (this.playerController) {
+      this.playerController.update()
+    }
 
-      // Update interactions (proximity detection, E key, etc.)
-      if (this.interactionManager) {
-        this.interactionManager.update()
-      }
-    } catch (error) {
-      console.error('Error in VillageScene.update:', error)
+    // Update interactions (proximity detection, E key, etc.)
+    if (this.interactionManager) {
+      this.interactionManager.update()
+    }
+  }
+
+  cleanup() {
+    // Clean up store subscription
+    if (this.storeUnsubscribe) {
+      this.storeUnsubscribe()
+      this.storeUnsubscribe = null
     }
   }
 }

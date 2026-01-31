@@ -328,7 +328,7 @@ export const houses = [
     status: "normal",
     infectedImage: "assets/murder-house1.png",
     day1: { npc: { name: "Tobin the Hunter", portrait: "assets/farmer.png", dialog: [day1_house3_tobin] } },
-    day2: { npd: null, status: "dead", infectedImage: "assets/murder-house1.png" }, // No NPC data needed if status dead? UI handles it.
+    day2: { npc: null, status: "dead", infectedImage: "assets/murder-house1.png" }, // No NPC data needed if status dead? UI handles it.
     npc: { name: "Tobin the Hunter", portrait: "assets/farmer.png", dialog: [day1_house3_tobin] }
   },
   {
