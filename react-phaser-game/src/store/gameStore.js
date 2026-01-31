@@ -1,112 +1,73 @@
 import { create } from 'zustand'
-import { DEFAULT_SEED, generateVillage } from '../data/village'
+import { houses as initialHouses } from '../data/houses'
 
-/**
- * Global game store (React + Phaser bridge).
- *
- * Phaser reads state via `useGameStore.getState()` (no React re-render coupling).
- * React overlays subscribe via the hook.
- */
+// Helper to find a random normal villager house
+const findRandomNormalHouse = (houses) => {
+  const normalHouses = houses.filter(h => h.type === 'villager' && h.status === 'normal')
+  if (normalHouses.length === 0) return null
+  const randomIndex = Math.floor(Math.random() * normalHouses.length)
+  return normalHouses[randomIndex]
+}
+
 export const useGameStore = create((set, get) => {
-  const initialVillage = generateVillage(DEFAULT_SEED)
-
   return {
-    // --- World / Progress ---
-    seed: DEFAULT_SEED,
-    day: 1,
-    village: initialVillage.houses, // Array of VillageHouse
-    restSpot: initialVillage.restSpot,
-    chosenNormalForDay2: initialVillage.chosenNormalForDay2,
+    houses: JSON.parse(JSON.stringify(initialHouses)), // Deep copy to allow mutation
+    cycle: 1, // Day cycle
+    isPaused: false,
+    currentHouse: null, // The house currently being interacted with
 
-    // --- Flags ---
-    summoningVisited: false,
+    // Actions
 
-    // --- Overlay / Event system ---
-    isPaused: false, // used by Phaser to freeze movement
-    activeEvent: null, // { houseId, type: 'dialog'|'image'|'dayTransition', data }
-
-    // --- Actions ---
-    initGame: (seed = DEFAULT_SEED) => {
-      const village = generateVillage(seed)
-      set({
-        seed,
-        day: 1,
-        village: village.houses,
-        restSpot: village.restSpot,
-        chosenNormalForDay2: village.chosenNormalForDay2,
-        summoningVisited: false,
-        isPaused: false,
-        activeEvent: null
-      })
-    },
-
-    /** Returns the current day's event for a given house (or null). */
-    getHouseEventForToday: (houseId) => {
-      const { village, day } = get()
-      const house = village.find((h) => h.id === houseId)
-      if (!house) return null
-      return house.eventsByDay?.[day] || null
-    },
-
-    /** Opens an event overlay for interacting with a house. */
+    // Open house interaction
     openHouseEvent: (houseId) => {
-      const { village, day, summoningVisited } = get()
-      const house = village.find((h) => h.id === houseId)
-      if (!house) return false
-
-      const event = house.eventsByDay?.[day]
-      if (!event) return false
-
-      // Mark summoning visited (Day 1 objective)
-      const nextSummoningVisited =
-        summoningVisited || (day === 1 && house.type === 'summoning')
+      const { houses } = get()
+      const house = houses.find(h => h.id === houseId)
+      if (!house) return
 
       set({
-        summoningVisited: nextSummoningVisited,
-        isPaused: true,
-        activeEvent: {
-          houseId,
-          type: event.type,
-          data: event.data
-        }
+        currentHouse: house,
+        isPaused: true
       })
-
-      return true
     },
 
-    /** Closes the current overlay and resumes the game. */
-    closeActiveEvent: () => {
+    // Close interaction
+    closeHouseMenu: () => {
       set({
-        activeEvent: null,
+        currentHouse: null,
         isPaused: false
       })
     },
 
-    /** Starts a day transition overlay (does not change day until continued). */
-    beginDayTransition: (toDay) => {
-      set({
-        isPaused: true,
-        activeEvent: {
-          houseId: null,
-          type: 'dayTransition',
-          data: { toDay }
+    // Sleep action (triggered from Guard House - Moves to Day 2)
+    sleep: () => {
+      const { houses, cycle } = get()
+      const nextCycle = cycle + 1
+
+      let newHouses = houses.map(h => {
+        // Deep copy house
+        const house = { ...h }
+
+        // If transitioning to Day 2, swap data
+        if (nextCycle === 2) {
+          if (house.day2) {
+            if (house.day2.npc) {
+              house.npc = house.day2.npc
+            }
+            if (house.day2.status) {
+              house.status = house.day2.status
+            }
+            if (house.day2.infectedImage) {
+              house.infectedImage = house.day2.infectedImage
+            }
+          }
         }
+        return house
       })
-    },
-
-    /** Completes the day transition and resumes game. */
-    completeDayTransition: () => {
-      const state = get()
-      const toDay = state.activeEvent?.data?.toDay
-      if (typeof toDay !== 'number') {
-        // Fallback: just close.
-        set({ activeEvent: null, isPaused: false })
-        return
-      }
 
       set({
-        day: toDay,
-        activeEvent: null,
+        houses: newHouses,
+        cycle: nextCycle,
+        currentHouse: null,
         isPaused: false
       })
     }

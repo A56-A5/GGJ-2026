@@ -87,7 +87,7 @@ export class InteractionManager {
 
     // Update closest house and interaction indicator
     const houseChanged = closestHouse !== this.closestHouse
-    
+
     if (houseChanged) {
       // Clear previous highlight
       if (this.closestHouse) {
@@ -110,7 +110,10 @@ export class InteractionManager {
     // Position in world coordinates (above the house)
     if (this.closestHouse && this.interactionIcon) {
       const worldX = this.closestHouse.x
-      const worldY = this.closestHouse.y - 60 // 60 pixels above house
+      // Dynamic height calculation: Top of sprite - padding
+      // If width/height data is missing, fallback to fixed offset
+      const halfHeight = (this.closestHouse.height || 100) / 2
+      const worldY = this.closestHouse.y - halfHeight - 40
 
       // Update position in world coordinates
       this.interactionIcon.setPosition(worldX, worldY)

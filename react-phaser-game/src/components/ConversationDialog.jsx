@@ -1,107 +1,141 @@
+
 import React, { useState, useEffect } from 'react'
 import { useGameStore } from '../store/gameStore'
 import './ConversationDialog.css'
 
-/**
- * Fullscreen Conversation Dialog Component
- * 
- * Displays NPC conversations driven entirely by house data
- * No hardcoded text - all content comes from NPC dialog structure
- * 
- * Resets to initial dialog state each time it opens
- */
 export function ConversationDialog() {
-  const { currentHouse, closeHouseMenu } = useGameStore()
+  const { currentHouse, closeHouseMenu, sleep } = useGameStore()
+
+  // Track the current dialogue node being displayed
+  const [activeDialog, setActiveDialog] = useState(null)
+
+  // Track if we are showing the response to an option
   const [showingResponse, setShowingResponse] = useState(false)
-  const [currentResponse, setCurrentResponse] = useState(null)
+  const [currentResponseText, setCurrentResponseText] = useState(null)
+
+  // Track which option was clicked to know where to go next
+  const [pendingNextDialog, setPendingNextDialog] = useState(null)
 
   // Reset dialog state whenever a new house is opened
-  // This ensures the dialog always starts from the beginning
   useEffect(() => {
-    if (currentHouse) {
+    if (currentHouse && currentHouse.npc && currentHouse.npc.dialog) {
+      setActiveDialog(currentHouse.npc.dialog[0])
       setShowingResponse(false)
-      setCurrentResponse(null)
+      setCurrentResponseText(null)
+      setPendingNextDialog(null)
     }
   }, [currentHouse])
 
-  if (!currentHouse || !currentHouse.npc) {
-    return null
+  if (!currentHouse) return null
+
+  // --- Infected / Dead State ---
+  if (currentHouse.status === 'infected' || currentHouse.status === 'dead') {
+    return (
+      <div className="infected-overlay">
+        <div className="infected-content">
+          <div className="infected-image-container">
+            {currentHouse.infectedImage ? (
+              <img src={currentHouse.infectedImage} alt="Something wrong" className="infected-image-fullscreen" />
+            ) : (
+              <div className="infected-image-placeholder">
+                <h2>SOMETHING IS WRONG</h2>
+              </div>
+            )}
+          </div>
+          <button className="infected-exit-button" onClick={closeHouseMenu}>
+            LEAVE
+          </button>
+        </div>
+      </div>
+    )
   }
 
+  // --- Normal/Guard State ---
   const npc = currentHouse.npc
-  const dialogs = npc.dialog || []
-  const currentDialog = dialogs[0] // Start with first dialog
-
-  if (!currentDialog) {
-    return null
-  }
+  if (!activeDialog) return null
 
   const handleOptionClick = (option) => {
+    if (option.action === 'sleep') {
+      sleep()
+      return
+    }
+
+    if (option.action === 'close') {
+      closeHouseMenu()
+      return
+    }
+
     if (option.response) {
-      // Show the response text
-      setCurrentResponse(option.response)
+      // Show response first
+      setCurrentResponseText(option.response)
       setShowingResponse(true)
+      // Store where we go next (if any)
+      setPendingNextDialog(option.nextDialog || null)
+    } else if (option.nextDialog) {
+      // No response text, just jump to next dialog
+      setActiveDialog(option.nextDialog)
     } else {
-      // "Goodbye" or similar - close dialog
+      // No response, no next dialog -> Close? (Default behavior)
       closeHouseMenu()
     }
   }
 
-  const handleResponseContinue = () => {
-    // After showing response, close the dialog
-    // Reset state before closing
+  const handleContinue = () => {
     setShowingResponse(false)
-    setCurrentResponse(null)
-    closeHouseMenu()
-  }
+    setCurrentResponseText(null)
 
-  const handleClose = () => {
-    // Reset state before closing
-    setShowingResponse(false)
-    setCurrentResponse(null)
-    closeHouseMenu()
+    if (pendingNextDialog) {
+      setActiveDialog(pendingNextDialog)
+      setPendingNextDialog(null)
+    } else {
+      // If no next dialog defined after a response, usually loop back or close?
+      // For this script, leaf nodes usually end conversation or provided interactions are explicit.
+      // If we are at a leaf with no nextDialog, we stay? No, the user script implies flow.
+      // If "Back" logic is needed, we'd need a history stack. 
+      // For now, if no next dialog, we close (as most options in script have nextDialog or are "Goodbye").
+      // Actually, looking at the script: "That's all" -> "Hope you..." -> End.
+      // So if no nextDialog, we close.
+      closeHouseMenu()
+    }
   }
 
   return (
-    <div className="conversation-overlay" onClick={handleClose}>
-      <div className="conversation-dialog" onClick={(e) => e.stopPropagation()}>
-        {/* Left Side - Big Portrait */}
+    <div className="conversation-overlay">
+      <div className="conversation-container">
+        {/* Left Side: Image */}
         <div className="conversation-left">
-          <div className="conversation-portrait-large">
-            <div className="portrait-placeholder-large">
-              {npc.name.charAt(0)}
+          {npc.portrait ? (
+            <img src={npc.portrait} alt={npc.name} className="npc-portrait-img" onError={(e) => e.target.style.display = 'none'} />
+          ) : (
+            <div className="conversation-image-placeholder">
+              {currentHouse.type === 'guard' ? '🛡️' : `🏠`}
             </div>
-            <div className="conversation-npc-name-large">{npc.name}</div>
-          </div>
+          )}
         </div>
 
-        {/* Right Side - Top Half: Dialogue, Bottom Half: Options */}
+        {/* Right Side: Dialogue & Options */}
         <div className="conversation-right">
-          {/* Top Half - Dialogue Text */}
-          <div className="conversation-dialogue-section">
-            <div className="conversation-text-box">
-              {showingResponse ? (
-                <p className="conversation-text-content">{currentResponse}</p>
-              ) : (
-                <p className="conversation-text-content">{currentDialog.text}</p>
-              )}
+          {/* Top: Name & Dialogue */}
+          <div className="conversation-header">
+            <h2 className="npc-name">{npc.name}</h2>
+            <div className="dialogue-box">
+              <p>
+                {showingResponse ? currentResponseText : activeDialog.text}
+              </p>
             </div>
           </div>
 
-          {/* Bottom Half - Options */}
-          <div className="conversation-options-section">
+          {/* Bottom: Options */}
+          <div className="conversation-options">
             {showingResponse ? (
-              <button
-                className="conversation-option-button conversation-continue-button"
-                onClick={handleResponseContinue}
-              >
+              <button className="option-button" onClick={handleContinue}>
                 Continue
               </button>
             ) : (
-              currentDialog.options && currentDialog.options.map((option, index) => (
+              activeDialog.options && activeDialog.options.map((option, index) => (
                 <button
                   key={index}
-                  className="conversation-option-button"
+                  className="option-button"
                   onClick={() => handleOptionClick(option)}
                 >
                   {option.label}
@@ -110,11 +144,6 @@ export function ConversationDialog() {
             )}
           </div>
         </div>
-
-        {/* Close Button */}
-        <button className="conversation-close" onClick={handleClose}>
-          ×
-        </button>
       </div>
     </div>
   )

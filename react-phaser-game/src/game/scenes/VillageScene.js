@@ -3,8 +3,6 @@ import { AssetLoader } from '../utils/AssetLoader'
 import { PlayerController } from '../utils/PlayerController'
 import { HouseManager } from '../utils/HouseManager'
 import { InteractionManager } from '../utils/InteractionManager'
-import { QuestIndicatorManager } from '../utils/QuestIndicatorManager'
-import { RestManager } from '../utils/RestManager'
 import { useGameStore } from '../../store/gameStore'
 
 /**
@@ -23,8 +21,6 @@ export class VillageScene extends Phaser.Scene {
     this.playerController = null
     this.houseManager = null
     this.interactionManager = null
-    this.questIndicatorManager = null
-    this.restManager = null
   }
 
   preload() {
@@ -34,9 +30,6 @@ export class VillageScene extends Phaser.Scene {
   }
 
   create() {
-    // Ensure world is initialized (useful if you ever add a "new game" button later)
-    // (Does nothing if already initialized by default store state.)
-
     // Create placeholder images for missing assets
     this.assetLoader.createPlaceholders()
 
@@ -49,8 +42,7 @@ export class VillageScene extends Phaser.Scene {
 
     // Initialize player controller
     this.playerController = new PlayerController(this)
-    const { restSpot } = useGameStore.getState()
-    const player = this.playerController.create(restSpot?.x ?? 400, restSpot?.y ?? 300)
+    const player = this.playerController.create(800, 600) // Default spawn
 
     // Set up camera to follow player
     this.cameras.main.setBounds(0, 0, 1600, 1200)
@@ -58,21 +50,26 @@ export class VillageScene extends Phaser.Scene {
     this.cameras.main.setZoom(1)
 
     // Initialize house manager
-    const { village } = useGameStore.getState()
-    this.houseManager = new HouseManager(this, player, village)
+    // IMPORTANT: Sync with store houses (which contains status updates)
+    // We might need to listen to store updates to visually update houses (e.g. infection)
+    const { houses } = useGameStore.getState()
+    this.houseManager = new HouseManager(this, player, houses)
     const houseData = this.houseManager.create()
 
     // Initialize interaction manager
     this.interactionManager = new InteractionManager(this, houseData, this.playerController)
     this.interactionManager.create()
 
-    // Quest indicator (Day 1: summoning circle)
-    this.questIndicatorManager = new QuestIndicatorManager(this, this.houseManager)
-    this.questIndicatorManager.create()
-
-    // Rest manager (Day transition trigger)
-    this.restManager = new RestManager(this, this.playerController)
-    this.restManager.create()
+    // Listen for store changes to update house visuals (e.g. infected status)
+    useGameStore.subscribe((state) => {
+      // Ideally we would update house sprites here
+      // For now, simpler implementation: scene restart or simple update loop?
+      // Let's stick to update loop handling visual updates if needed
+      // Or simpler: The store updates -> React updates UI. 
+      // House sprites in Phaser are static unless we animate them.
+      // Requirement: "One of the houses will be showing the indicator of yellow or exclamation mark"
+      // We can handle this in InteractionManager or HouseManager update
+    })
   }
 
   update() {
@@ -91,16 +88,6 @@ export class VillageScene extends Phaser.Scene {
       // Update interactions (proximity detection, E key, etc.)
       if (this.interactionManager) {
         this.interactionManager.update()
-      }
-
-      // Update quest indicator
-      if (this.questIndicatorManager) {
-        this.questIndicatorManager.update()
-      }
-
-      // Update rest prompt
-      if (this.restManager) {
-        this.restManager.update()
       }
     } catch (error) {
       console.error('Error in VillageScene.update:', error)

@@ -1,8 +1,6 @@
 import React from 'react'
 import { GameContainer } from './components/GameContainer'
-import { FullscreenDialogEvent } from './components/FullscreenDialogEvent'
-import { FullscreenImageEvent } from './components/FullscreenImageEvent'
-import { DayTransitionScreen } from './components/DayTransitionScreen'
+import { ConversationDialog } from './components/ConversationDialog'
 import './App.css'
 
 /**
@@ -13,9 +11,7 @@ function App() {
   return (
     <div className="app">
       <GameContainer />
-      <FullscreenImageEvent />
-      <FullscreenDialogEvent />
-      <DayTransitionScreen />
+      <ConversationDialog />
     </div>
   )
 }

@@ -2,6 +2,8 @@
  * House Manager
  * Handles house creation, collision, and data management
  */
+import { useGameStore } from '../../store/gameStore'
+
 export class HouseManager {
   constructor(scene, player, houses) {
     this.scene = scene
@@ -10,29 +12,34 @@ export class HouseManager {
     this.houseSprites = []
     this.houseData = []
     this.housesById = new Map()
+    // Indicators mapping: houseId -> indicatorSprite
+    this.indicators = new Map()
   }
 
   create() {
-    // Create houses from data structure (data-driven; any count)
+    // Create houses from data structure
     this.houses.forEach((houseConfig) => {
       // Create house sprite group for physics
       const houseGroup = this.scene.physics.add.staticGroup()
+      // Use correct property names from houses.js (x, y, image)
       const houseSprite = houseGroup.create(
-        houseConfig.position.x,
-        houseConfig.position.y,
-        houseConfig.textureKey
+        houseConfig.x,
+        houseConfig.y,
+        houseConfig.image
       )
       houseSprite.setOrigin(0.5, 0.5)
       houseSprite.setScale(1)
 
-      // Store complete house data (type + events)
+      // Store complete house data
       const houseData = {
         id: houseConfig.id,
         type: houseConfig.type,
-        x: houseConfig.position.x,
-        y: houseConfig.position.y,
-        eventsByDay: houseConfig.eventsByDay,
-        sprite: houseSprite
+        x: houseConfig.x,
+        y: houseConfig.y,
+        status: houseConfig.status,
+        sprite: houseSprite,
+        width: houseSprite.width, // Store dimensions for UI
+        height: houseSprite.height
       }
 
       this.houseSprites.push(houseGroup)
@@ -44,22 +51,63 @@ export class HouseManager {
 
       // Make house interactive (clickable)
       houseSprite.setInteractive({ useHandCursor: true })
-      houseSprite.on('pointerover', () => {
-        // Only highlight if not already the closest house
-        // This will be managed by InteractionManager
-        if (!houseSprite.tintTopLeft) {
-          houseSprite.setTint(0xffff00) // Yellow highlight on hover
-        }
-      })
-      houseSprite.on('pointerout', () => {
-        // Only clear tint if not the closest house
-        if (!houseSprite.tintTopLeft || houseSprite.tintTopLeft === 0xffff00) {
-          houseSprite.clearTint()
-        }
-      })
+
+      // Initial visual check
+      this.updateHouseVisual(houseData)
+    })
+
+    // Subscribe to store updates to handle status changes (infection)
+    useGameStore.subscribe((state) => {
+      this.updateAllVisuals(state.houses)
     })
 
     return this.houseData
+  }
+
+  updateAllVisuals(housesState) {
+    housesState.forEach(updatedHouse => {
+      const existingHouseData = this.housesById.get(updatedHouse.id)
+      if (existingHouseData) {
+        // Update local status
+        existingHouseData.status = updatedHouse.status
+        this.updateHouseVisual(existingHouseData)
+      }
+    })
+  }
+
+  updateHouseVisual(houseData) {
+    // Manage warning indicator for infected houses
+    if (houseData.status === 'infected') {
+      if (!this.indicators.has(houseData.id)) {
+        // Create a warning mark above the house
+        const indicator = this.scene.add.text(houseData.x, houseData.y - 100, '!', {
+          fontSize: '64px',
+          fill: '#ff0000',
+          fontStyle: 'bold',
+          stroke: '#000000',
+          strokeThickness: 6
+        }).setOrigin(0.5)
+
+        // Add a simple tween to make it bob
+        this.scene.tweens.add({
+          targets: indicator,
+          y: houseData.y - 120,
+          duration: 1000,
+          yoyo: true,
+          repeat: -1
+        })
+
+        this.indicators.set(houseData.id, indicator)
+        houseData.sprite.setTint(0x888888) // Darken the house sprite
+      }
+    } else {
+      // Remove indicator if it exists (e.g. if cured, though not in plan yet)
+      if (this.indicators.has(houseData.id)) {
+        this.indicators.get(houseData.id).destroy()
+        this.indicators.delete(houseData.id)
+        houseData.sprite.clearTint()
+      }
+    }
   }
 
   getAllHouses() {

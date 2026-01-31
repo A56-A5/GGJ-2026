@@ -1,210 +1,358 @@
-/**
- * House Data Model
- * 
- * This file contains all house definitions with NPC data.
- * The structure is designed to be extensible for random generation.
- * 
- * Future: generateVillage(seed) → houses[]
- */
+// Helper to create simple dialogue response -> next options
+const createDialog = (text, options = []) => ({ text, options })
+
+// --- DAY 1 DIALOGUES ---
+
+const day1_house1_eldric = createDialog("You’re here about Corin, aren’t you.", [
+  {
+    label: "When did you last see Corin?",
+    response: "Yesterday. Near dusk.",
+    nextDialog: createDialog("Yesterday. Near dusk.", [
+      { label: "Was he alone?", response: "As usual." },
+      { label: "Anything strange?", response: "He stared too long." }
+    ])
+  },
+  {
+    label: "Describe his behavior.",
+    response: "Quiet. Unsettling.",
+    nextDialog: createDialog("Quiet. Unsettling.", [
+      { label: "In what way?", response: "Like he was listening." },
+      { label: "To what?", response: "To people, not sounds." }
+    ])
+  },
+  {
+    label: "Did he mention leaving?",
+    response: "No.",
+    nextDialog: createDialog("No.", [
+      { label: "Did he seem afraid?", response: "No. Curious." }
+    ])
+  },
+  // End Options
+  { label: "That’s all.", response: "Hope you find him." },
+  { label: "If you remember more, tell me.", response: "I will." },
+  { label: "Stay available.", response: "Of course." }
+])
+
+const day1_house2_marra = createDialog("He’s gone, isn’t he?", [
+  {
+    label: "You treated Corin before.",
+    response: "Yes.",
+    nextDialog: createDialog("Yes.", [
+      { label: "For what?", response: "Sleeplessness." },
+      { label: "Nightmares?", response: "No. Obsessions." }
+    ])
+  },
+  {
+    label: "Did he say anything strange?",
+    response: "He asked how to be someone else.",
+    nextDialog: createDialog("He asked how to be someone else.", [
+      { label: "Exactly?", response: "Those words." },
+      { label: "Your reaction?", response: "I stopped seeing him." }
+    ])
+  },
+  {
+    label: "Did you see him last night?",
+    response: "No.",
+    nextDialog: createDialog("No.", [
+      { label: "Hear him?", response: "Yes." },
+      { label: "From where?", response: "Near my window." }
+    ])
+  },
+  // End Options
+  { label: "That’s enough.", response: "Be careful." },
+  { label: "Why didn’t you report this?", response: "I thought he was harmless." },
+  { label: "I may return.", response: "I won’t sleep." }
+])
+
+const day1_house3_tobin = createDialog("Don’t pin this on me.", [
+  {
+    label: "Did you interact with Corin?",
+    response: "Barely.",
+    nextDialog: createDialog("Barely.", [
+      { label: "Why avoid him?", response: "Predators don’t look at you like that." },
+      { label: "Like what?", response: "Like practice." }
+    ])
+  },
+  {
+    label: "Last time you saw him?",
+    response: "Yesterday.",
+    nextDialog: createDialog("Yesterday.", [
+      { label: "Where?", response: "Near the treeline." },
+      { label: "What was he doing?", response: "Watching houses." }
+    ])
+  },
+  {
+    label: "Did you follow him?",
+    response: "No.",
+    nextDialog: createDialog("No.", [
+      { label: "Wanted to?", response: "Yes." }
+    ])
+  },
+  // End Options
+  { label: "You’re clear.", response: "Good." },
+  { label: "If you remember more…", response: "I’ll come find you." },
+  { label: "Stay inside tonight.", response: "I will." }
+])
+
+const day1_house4_lysa = createDialog("…He asked me questions.", [
+  {
+    label: "What kind of questions?",
+    response: "About routines.",
+    nextDialog: createDialog("About routines.", [
+      { label: "Whose?", response: "Everyone’s." },
+      { label: "Yours?", response: "Yes." }
+    ])
+  },
+  {
+    label: "Did he scare you?",
+    response: "No.",
+    nextDialog: createDialog("No.", [
+      { label: "Then why pause?", response: "Because I didn’t like him." }
+    ])
+  },
+  {
+    label: "Did you see him last night?",
+    response: "Yes.",
+    nextDialog: createDialog("Yes.", [
+      { label: "Time?", response: "Late." },
+      { label: "Doing what?", response: "Standing still." }
+    ])
+  },
+  // End Options
+  { label: "That’s all.", response: "…Okay." },
+  { label: "You did nothing wrong.", response: "…Thank you." },
+  { label: "I might return.", response: "I’ll remember." }
+])
+
+const day1_house5_bram = createDialog("He was always wrong.", [
+  {
+    label: "How so?",
+    response: "He listened too hard.",
+    nextDialog: createDialog("He listened too hard.", [
+      { label: "To what?", response: "People." },
+      { label: "Intentions?", response: "Yes." }
+    ])
+  },
+  {
+    label: "Did you warn anyone?",
+    response: "I warned him.",
+    nextDialog: createDialog("I warned him.", [
+      { label: "About what?", response: "Becoming something else." }
+    ])
+  },
+  {
+    label: "Do you think he left?",
+    response: "No.",
+    nextDialog: createDialog("No.", [
+      { label: "Then what happened?", response: "He succeeded." }
+    ])
+  },
+  // End Options
+  { label: "That’s enough.", response: "For today." },
+  { label: "You know more.", response: "And you know less." },
+  { label: "I’ll return.", response: "You should." }
+])
+
+// --- DAY 2 DIALOGUES ---
+
+// House 3 (Tobin) is DEAD. No dialogue. Handled by status="dead" check in UI.
+
+const day2_house1_eldric = createDialog("You saw him, didn’t you…", [
+  {
+    label: "When did you last see Tobin alive?",
+    response: "Yesterday evening.",
+    nextDialog: createDialog("Yesterday evening.", [
+      { label: "Where?", response: "Near the fields." },
+      { label: "Alone?", response: "Yes. That’s normal." }
+    ])
+  },
+  {
+    label: "Did you hear anything last night?",
+    response: "No.",
+    nextDialog: createDialog("No.", [
+      { label: "Nothing at all?", response: "…No." },
+      { label: "You hesitated.", response: "Because I don’t want to think about it." }
+    ])
+  },
+  {
+    label: "Who would Tobin trust enough to open his door?",
+    response: "Anyone. He wasn’t careful.",
+    nextDialog: createDialog("Anyone. He wasn’t careful.", [
+      { label: "Anyone specific?", response: "No." },
+      { label: "Not even Corin?", response: "…Especially not him." }
+    ])
+  },
+  // End Options
+  { label: "That’s all.", response: "Find whoever did this." },
+  { label: "Stay inside tonight.", response: "I will." },
+  { label: "I may return.", response: "I won’t sleep anyway." }
+])
+
+const day2_house2_marra = createDialog("That’s unfortunate.", [
+  { label: "You don’t seem shocked.", response: "Shock doesn’t help." },
+  {
+    label: "When did you last see Tobin?",
+    response: "Yesterday.",
+    nextDialog: createDialog("Yesterday.", [
+      { label: "Time?", response: "Evening." },
+      { label: "Where?", response: "Outside." }
+    ])
+  },
+  {
+    label: "Did Tobin come to you for herbs?",
+    response: "No."
+  },
+  {
+    label: "How would someone remove a face?",
+    response: "…Why ask that?",
+    nextDialog: createDialog("…Why ask that?", [
+      { label: "Answer the question.", response: "With tools." }
+    ])
+  },
+  // End Options
+  { label: "That’s all.", response: "Good." },
+  { label: "You’re acting strange.", response: "Everyone is." },
+  { label: "I’ll be watching you.", response: "You already are." }
+])
+
+const day2_house4_lysa = createDialog("He doesn’t have a face…", [
+  {
+    label: "Did you see anyone near Tobin’s house?",
+    response: "No.",
+    nextDialog: createDialog("No.", [
+      { label: "Hear anything?", response: "Yes." },
+      { label: "What?", response: "Someone walking slowly." }
+    ])
+  },
+  {
+    label: "Slowly?",
+    response: "Like they knew where they were going."
+  },
+  {
+    label: "Did you recognize them?",
+    response: "No.",
+    nextDialog: createDialog("No.", [
+      { label: "Silhouette?", response: "Wrong." },
+      { label: "Wrong how?", response: "Too still." }
+    ])
+  },
+  { label: "Who are you afraid of?", response: "…Everyone." },
+  // End Options
+  { label: "You’re safe for now.", response: "No one is." },
+  { label: "Stay inside.", response: "I won’t sleep." },
+  { label: "I may return.", response: "…Okay." }
+])
+
+const day2_house5_bram = createDialog("It’s begun.", [
+  { label: "You expected this?", response: "I feared it." },
+  {
+    label: "What took Tobin’s face?",
+    response: "Something that needed it.",
+    nextDialog: createDialog("Something that needed it.", [
+      { label: "For what?", response: "Practice." }
+    ])
+  },
+  {
+    label: "Who is in danger next?",
+    response: "Those who are watched.",
+    nextDialog: createDialog("Those who are watched.", [
+      { label: "Who’s watching?", response: "It is." }
+    ])
+  },
+  {
+    label: "Is someone not who they seem?",
+    response: "Yes.",
+    nextDialog: createDialog("Yes.", [
+      { label: "Who?", response: "You must decide that." },
+      { label: "Why not tell me?", response: "Because it learns faster that way." }
+    ])
+  },
+  // End Options
+  { label: "That’s enough.", response: "For today." },
+  { label: "You know more.", response: "And you know less." },
+  { label: "I’ll return.", response: "You should." }
+])
 
 export const houses = [
   {
-    id: "house_1",
-    x: 200,
-    y: 200,
-    image: "house1", // Phaser texture key
+    id: "guard_house",
+    type: "guard",
+    x: 800,
+    y: 150,
+    image: "house3",
+    status: "normal",
     npc: {
-      name: "Elder Rowan",
-      portrait: "elder.png", // Future: portrait image path
+      name: "Guard Captain",
+      portrait: "assets/farmer.png",
       dialog: [
         {
-          text: "Ah, a new face in the village. Welcome, traveler.",
+          text: "Night is falling. Do you wish to sleep until morning?",
           options: [
-            { 
-              label: "Who are you?", 
-              response: "I am Elder Rowan, the guide of this village. I've watched over these lands for many years.",
-              nextDialog: null // End conversation
-            },
-            { 
-              label: "Any work for me?", 
-              response: "The farmers could use help with their harvest. Speak to Merchant Lyra about supplies.",
-              nextDialog: null
-            },
-            { 
-              label: "Tell me about this place.", 
-              response: "This village has stood for generations. We're a peaceful folk, always welcoming to travelers.",
-              nextDialog: null
-            },
-            { 
-              label: "Goodbye", 
-              response: "May your journey be safe, traveler.",
-              nextDialog: null
-            }
+            { label: "Sleep (Next Day)", action: "sleep", response: "Rest well." },
+            { label: "Cancel", action: "close", response: "Stay safe." }
           ]
         }
       ]
     }
+  },
+  {
+    id: "house_1",
+    type: "villager",
+    x: 200,
+    y: 300,
+    image: "house1",
+    status: "normal",
+    infectedImage: "assets/murder-house1.png",
+    day1: { npc: { name: "Eldric the Miller", portrait: "assets/farmer.png", dialog: [day1_house1_eldric] } },
+    day2: { npc: { name: "Eldric the Miller", portrait: "assets/farmer.png", dialog: [day2_house1_eldric] } },
+    npc: { name: "Eldric the Miller", portrait: "assets/farmer.png", dialog: [day1_house1_eldric] }
   },
   {
     id: "house_2",
-    x: 600,
-    y: 300,
+    type: "villager",
+    x: 1200,
+    y: 350,
     image: "house2",
-    npc: {
-      name: "Merchant Lyra",
-      portrait: "merchant.png",
-      dialog: [
-        {
-          text: "Welcome to my store! I have the finest goods in the village. What can I do for you?",
-          options: [
-            { 
-              label: "What do you sell?", 
-              response: "I have tools, supplies, and rare items from distant lands. Everything a traveler might need!",
-              nextDialog: null
-            },
-            { 
-              label: "Any quests available?", 
-              response: "I need someone to gather herbs from the forest. I'll pay well for quality ingredients.",
-              nextDialog: null
-            },
-            { 
-              label: "Tell me about yourself.", 
-              response: "I've been trading here for years. This village is my home, and I know everyone's needs.",
-              nextDialog: null
-            },
-            { 
-              label: "Goodbye", 
-              response: "Come back anytime! I always have new stock arriving.",
-              nextDialog: null
-            }
-          ]
-        }
-      ]
-    }
+    status: "normal",
+    infectedImage: "assets/murder-house2.png",
+    day1: { npc: { name: "Marra the Herbalist", portrait: "assets/farmer.png", dialog: [day1_house2_marra] } },
+    day2: { npc: { name: "Marra (Herbalist)", portrait: "assets/farmer.png", dialog: [day2_house2_marra] } },
+    npc: { name: "Marra the Herbalist", portrait: "assets/farmer.png", dialog: [day1_house2_marra] }
   },
   {
     id: "house_3",
-    x: 1000,
-    y: 500,
+    type: "villager",
+    x: 400,
+    y: 600,
     image: "house3",
-    npc: {
-      name: "Mayor Thorne",
-      portrait: "mayor.png",
-      dialog: [
-        {
-          text: "Welcome to the Town Hall. I'm Mayor Thorne. How can I assist you today?",
-          options: [
-            { 
-              label: "What's your role here?", 
-              response: "I oversee the village's administration and ensure everyone's needs are met. It's a responsibility I take seriously.",
-              nextDialog: null
-            },
-            { 
-              label: "Any village news?", 
-              response: "We're planning a festival next month. Everyone is welcome to join the celebration!",
-              nextDialog: null
-            },
-            { 
-              label: "Tell me about the village.", 
-              response: "Our village thrives on cooperation. Each person contributes, and we all benefit. It's a simple but effective system.",
-              nextDialog: null
-            },
-            { 
-              label: "Goodbye", 
-              response: "Feel free to visit anytime. The Town Hall is always open to citizens and visitors.",
-              nextDialog: null
-            }
-          ]
-        }
-      ]
-    }
+    status: "normal",
+    infectedImage: "assets/murder-house1.png",
+    day1: { npc: { name: "Tobin the Hunter", portrait: "assets/farmer.png", dialog: [day1_house3_tobin] } },
+    day2: { npd: null, status: "dead", infectedImage: "assets/murder-house1.png" }, // No NPC data needed if status dead? UI handles it.
+    npc: { name: "Tobin the Hunter", portrait: "assets/farmer.png", dialog: [day1_house3_tobin] }
   },
   {
     id: "house_4",
-    x: 400,
+    type: "villager",
+    x: 1000,
     y: 700,
     image: "house1",
-    npc: {
-      name: "Farmer Ben",
-      portrait: "farmer.png",
-      dialog: [
-        {
-          text: "Howdy! I'm Ben, the local farmer. Need something?",
-          options: [
-            { 
-              label: "What do you grow?", 
-              response: "I grow wheat, vegetables, and fruits. The soil here is rich, perfect for farming.",
-              nextDialog: null
-            },
-            { 
-              label: "Need any help?", 
-              response: "Always! The harvest season is coming, and extra hands are always welcome. Talk to Elder Rowan about work.",
-              nextDialog: null
-            },
-            { 
-              label: "Tell me about farming.", 
-              response: "Farming is hard work, but it's honest work. I take pride in feeding the village with my crops.",
-              nextDialog: null
-            },
-            { 
-              label: "Goodbye", 
-              response: "Take care now! Watch out for my fields if you're walking around.",
-              nextDialog: null
-            }
-          ]
-        }
-      ]
-    }
+    status: "normal",
+    infectedImage: "assets/murder-house1.png",
+    day1: { npc: { name: "Lysa the Weaver", portrait: "assets/farmer.png", dialog: [day1_house4_lysa] } },
+    day2: { npc: { name: "Lysa the Weaver", portrait: "assets/farmer.png", dialog: [day2_house4_lysa] } },
+    npc: { name: "Lysa the Weaver", portrait: "assets/farmer.png", dialog: [day1_house4_lysa] }
   },
   {
     id: "house_5",
-    x: 1200,
-    y: 800,
+    type: "villager",
+    x: 700,
+    y: 900,
     image: "house2",
-    npc: {
-      name: "Innkeeper Sarah",
-      portrait: "innkeeper.png",
-      dialog: [
-        {
-          text: "Welcome to the village inn! I'm Sarah. Need a place to rest or a warm meal?",
-          options: [
-            { 
-              label: "What services do you offer?", 
-              response: "I provide rooms for travelers, hot meals, and a place to relax. The inn is the heart of the village's social life!",
-              nextDialog: null
-            },
-            { 
-              label: "Any interesting stories?", 
-              response: "Oh, I've heard many tales from travelers! Some say there are ancient ruins beyond the forest. Fascinating stuff!",
-              nextDialog: null
-            },
-            { 
-              label: "Tell me about yourself.", 
-              response: "I inherited this inn from my parents. I love meeting new people and hearing their stories. It's never boring!",
-              nextDialog: null
-            },
-            { 
-              label: "Goodbye", 
-              response: "Come back for a meal anytime! My cooking is the best in the village.",
-              nextDialog: null
-            }
-          ]
-        }
-      ]
-    }
+    status: "normal",
+    infectedImage: "assets/murder-house2.png",
+    day1: { npc: { name: "Bram the Elder", portrait: "assets/farmer.png", dialog: [day1_house5_bram] } },
+    day2: { npc: { name: "Bram the Elder", portrait: "assets/farmer.png", dialog: [day2_house5_bram] } },
+    npc: { name: "Bram the Elder", portrait: "assets/farmer.png", dialog: [day1_house5_bram] }
   }
 ]
-
-/**
- * Future function for random village generation
- * This demonstrates how the system will work with generated houses
- * 
- * @param {number} seed - Random seed for generation
- * @returns {Array} Array of house objects matching the structure above
- */
-export function generateVillage(seed) {
-  // Placeholder for future implementation
-  // This will generate houses with random positions, NPCs, and dialogs
-  // The core game logic will work without modification
-  return houses // For now, return hardcoded houses
-}
