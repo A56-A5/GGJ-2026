@@ -1,6 +1,15 @@
 import { create } from 'zustand'
 import { houses as initialHouses } from '../data/houses'
 
+// Helper to deep copy objects
+const deepCopy = (obj) => {
+  // Use structuredClone if available (modern browsers), otherwise fallback to JSON
+  if (typeof structuredClone !== 'undefined') {
+    return structuredClone(obj)
+  }
+  return JSON.parse(JSON.stringify(obj))
+}
+
 // Helper to find a random normal villager house
 const findRandomNormalHouse = (houses) => {
   const normalHouses = houses.filter(h => h.type === 'villager' && h.status === 'normal')
@@ -11,7 +20,7 @@ const findRandomNormalHouse = (houses) => {
 
 export const useGameStore = create((set, get) => {
   return {
-    houses: JSON.parse(JSON.stringify(initialHouses)), // Deep copy to allow mutation
+    houses: deepCopy(initialHouses), // Deep copy to allow mutation
     cycle: 1, // Day cycle
     isPaused: false,
     currentHouse: null, // The house currently being interacted with

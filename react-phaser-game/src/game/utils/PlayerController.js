@@ -19,7 +19,7 @@ export class PlayerController {
 
     // Ensure keyboard is enabled
     if (!this.scene.input.keyboard) {
-      console.error('Keyboard not available!')
+      // Keyboard input is not available - player will not be controllable
       return this.player
     }
 
@@ -44,28 +44,24 @@ export class PlayerController {
       return
     }
 
-    try {
-      let velocityX = 0
-      let velocityY = 0
+    let velocityX = 0
+    let velocityY = 0
 
-      // Check arrow keys or WASD
-      if ((this.cursors.left && this.cursors.left.isDown) || (this.wasdKeys.A && this.wasdKeys.A.isDown)) {
-        velocityX = -this.speed
-      } else if ((this.cursors.right && this.cursors.right.isDown) || (this.wasdKeys.D && this.wasdKeys.D.isDown)) {
-        velocityX = this.speed
-      }
-
-      if ((this.cursors.up && this.cursors.up.isDown) || (this.wasdKeys.W && this.wasdKeys.W.isDown)) {
-        velocityY = -this.speed
-      } else if ((this.cursors.down && this.cursors.down.isDown) || (this.wasdKeys.S && this.wasdKeys.S.isDown)) {
-        velocityY = this.speed
-      }
-
-      // Set velocity
-      this.player.setVelocity(velocityX, velocityY)
-    } catch (error) {
-      console.error('Error in PlayerController.update:', error)
+    // Check arrow keys or WASD
+    if ((this.cursors.left && this.cursors.left.isDown) || (this.wasdKeys.A && this.wasdKeys.A.isDown)) {
+      velocityX = -this.speed
+    } else if ((this.cursors.right && this.cursors.right.isDown) || (this.wasdKeys.D && this.wasdKeys.D.isDown)) {
+      velocityX = this.speed
     }
+
+    if ((this.cursors.up && this.cursors.up.isDown) || (this.wasdKeys.W && this.wasdKeys.W.isDown)) {
+      velocityY = -this.speed
+    } else if ((this.cursors.down && this.cursors.down.isDown) || (this.wasdKeys.S && this.wasdKeys.S.isDown)) {
+      velocityY = this.speed
+    }
+
+    // Set velocity
+    this.player.setVelocity(velocityX, velocityY)
   }
 
   getPosition() {

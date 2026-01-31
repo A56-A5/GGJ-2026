@@ -14,19 +14,16 @@ export function HouseMenu() {
   }
 
   const handleEnter = () => {
-    console.log(`Entering ${currentHouse.name}`)
     // Add your enter logic here
     closeHouseMenu()
   }
 
   const handleTrade = () => {
-    console.log(`Trading at ${currentHouse.name}`)
     // Add your trade logic here
     closeHouseMenu()
   }
 
   const handleTalk = () => {
-    console.log(`Talking at ${currentHouse.name}`)
     // Add your talk logic here
     closeHouseMenu()
   }
