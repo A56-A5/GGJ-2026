@@ -1,0 +1,62 @@
+.elimination-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(20, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2500;
+    color: white;
+}
+
+.elimination-content {
+    background: #2a0000;
+    padding: 2rem;
+    border: 2px solid red;
+    text-align: center;
+    max-width: 600px;
+    width: 90%;
+}
+
+.elimination-content h2 {
+    color: red;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.suspect-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.suspect-btn {
+    padding: 15px;
+    font-size: 1.2rem;
+    background: #500;
+    color: white;
+    border: 1px solid #f00;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.suspect-btn:hover {
+    background: #800;
+}
+
+.cancel-btn {
+    padding: 10px 20px;
+    background: transparent;
+    color: #aaa;
+    border: 1px solid #aaa;
+    cursor: pointer;
+}
+
+.cancel-btn:hover {
+    background: #333;
+    color: white;
+}

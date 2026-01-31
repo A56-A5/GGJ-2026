@@ -44,25 +44,35 @@ export const useGameStore = create((set, get) => {
       const nextCycle = cycle + 1
 
       let newHouses = houses.map(h => {
-        // Deep copy house
         const house = { ...h }
+        const dayKey = `day${nextCycle}`
 
-        // If transitioning to Day 2, swap data
-        if (nextCycle === 2) {
-          if (house.day2) {
-            if (house.day2.npc) {
-              house.npc = house.day2.npc
-            }
-            if (house.day2.status) {
-              house.status = house.day2.status
-            }
-            if (house.day2.infectedImage) {
-              house.infectedImage = house.day2.infectedImage
-            }
+        if (house[dayKey]) {
+          if (house[dayKey].npc) {
+            house.npc = house[dayKey].npc
+          }
+          if (house[dayKey].status) {
+            house.status = house[dayKey].status
+          }
+          if (house[dayKey].infectedImage) {
+            house.infectedImage = house[dayKey].infectedImage
           }
         }
         return house
       })
+
+      // Procedural fallback for days beyond scripted content (Day 4+)
+      // If no status changes were applied via script (implied by checking if ANY house changed, or just forcing a death if cycle > 3)
+      // The user says "doesn't infect anymore houses".
+      if (nextCycle > 3) {
+        const normalHouses = newHouses.filter(h => h.status === 'normal' && h.type === 'villager')
+        if (normalHouses.length > 0) {
+          const victimIndex = Math.floor(Math.random() * normalHouses.length)
+          const victim = normalHouses[victimIndex]
+          victim.status = 'dead'
+          victim.infectedImage = 'assets/murder-house1.png'
+        }
+      }
 
       set({
         houses: newHouses,
@@ -70,6 +80,51 @@ export const useGameStore = create((set, get) => {
         currentHouse: null,
         isPaused: false
       })
+    },
+
+    // --- ELIMINATION LOGIC ---
+    skinwalkerId: null,
+    hasWon: false,
+    eliminationMode: false,
+
+    // Initialize Skinwalker (should be called on app mount or store init if possible, or lazy load)
+    // We can do it in the create function logic if we move it out, but simpler to check in actions.
+    // Let's just pick one when the store is created? 
+    // Zustand create doesn't easily run init code inside.
+    // We'll lazy init or just pick ID now? 
+    // Let's rely on a helper or pick it in 'eliminate' if empty?
+    // Better: Pick it right here in initial state helper (outside logic).
+
+    setEliminationMode: (isActive) => set({ eliminationMode: isActive }),
+
+    eliminateVillager: (targetId) => {
+      const { skinwalkerId, houses } = get()
+      // If no skinwalker set, pick random living villager (except current target maybe? no, define truth first)
+      let currentSkinwalkerId = skinwalkerId
+      if (!currentSkinwalkerId) {
+        // Determine skinwalker now if not set
+        const potential = initialHouses.filter(h => h.type === 'villager' && h.status !== 'missing')
+        if (potential.length > 0) {
+          const r = Math.floor(Math.random() * potential.length)
+          currentSkinwalkerId = potential[r].id
+          set({ skinwalkerId: currentSkinwalkerId })
+        }
+      }
+
+      if (targetId === currentSkinwalkerId) {
+        // WIN
+        set({ hasWon: true, isPaused: true, currentHouse: null, eliminationMode: false })
+      } else {
+        // Kill the innocent
+        const newHouses = houses.map(h => {
+          if (h.id === targetId) {
+            return { ...h, status: 'dead', infectedImage: 'assets/murder-house1.png' }
+          }
+          return h
+        })
+        set({ houses: newHouses, currentHouse: null, eliminationMode: false, isPaused: false })
+      }
     }
+
   }
 })

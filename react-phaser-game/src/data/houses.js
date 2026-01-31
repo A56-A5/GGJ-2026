@@ -273,22 +273,54 @@ const day2_house5_bram = createDialog("It’s begun.", [
   { label: "I’ll return.", response: "You should." }
 ])
 
+// --- DAY 3 DIALOGUES ---
+
+const day3_house1_eldric = createDialog("Lysa... she's gone too.", [
+  { label: "Did you see anything?", response: "No. I hid." },
+  { label: "We need to do something.", response: "Pray. That is all." },
+  { label: "Who is next?", response: "You... or me." }
+])
+
+const day3_house2_marra = createDialog("Another face taken.", [
+  { label: "Why Lysa?", response: "She saw something." },
+  { label: "Are you enjoying this?", response: "I am surviving." },
+  { label: "Help me stop it.", response: "Stop the wind? Stop the rain? You cannot." }
+])
+
+const day3_house5_bram = createDialog("The circle tightens.", [
+  { label: "Is it a beast?", response: "It is a neighbor." },
+  { label: "Do you know who?", response: "I have suspicions. But words are dangerous." },
+  { label: "Tell me.", response: "Trust no one. Not even yourself." }
+])
+
 export const houses = [
+  {
+    id: "house_corin",
+    type: "villager",
+    x: 1500,
+    y: 210,
+    image: "house4",
+    status: "missing",
+    altImage: "house4-infected",
+    infectedImage: "assets/first-house.png",
+    npc: { name: "Corin's House", portrait: null, dialog: [] }
+  },
   {
     id: "guard_house",
     type: "guard",
-    x: 800,
-    y: 150,
-    image: "house3",
+    x: 860,
+    y: 280,
+    image: "house5",
     status: "normal",
     npc: {
       name: "Guard Captain",
-      portrait: "assets/farmer.png",
+      portrait: "assets/male1.png",
       dialog: [
         {
           text: "Night is falling. Do you wish to sleep until morning?",
           options: [
             { label: "Sleep (Next Day)", action: "sleep", response: "Rest well." },
+            { label: "Eliminate Villager", action: "eliminate", response: "Who do you suspect?" },
             { label: "Cancel", action: "close", response: "Stay safe." }
           ]
         }
@@ -298,61 +330,71 @@ export const houses = [
   {
     id: "house_1",
     type: "villager",
-    x: 200,
-    y: 300,
-    image: "house1",
+    x: 80,
+    y: 1100,
+    image: "house2",
     status: "normal",
+    altImage: "house2-infected",
     infectedImage: "assets/murder-house1.png",
-    day1: { npc: { name: "Eldric the Miller", portrait: "assets/farmer.png", dialog: [day1_house1_eldric] } },
-    day2: { npc: { name: "Eldric the Miller", portrait: "assets/farmer.png", dialog: [day2_house1_eldric] } },
-    npc: { name: "Eldric the Miller", portrait: "assets/farmer.png", dialog: [day1_house1_eldric] }
+    day1: { npc: { name: "Eldric the Miller", portrait: "assets/male1.png", dialog: [day1_house1_eldric] } },
+    day2: { npc: { name: "Eldric the Miller", portrait: "assets/male1.png", dialog: [day2_house1_eldric] } },
+    day3: { npc: { name: "Eldric the Miller", portrait: "assets/male1.png", dialog: [day3_house1_eldric] } },
+    npc: { name: "Eldric the Miller", portrait: "assets/male1.png", dialog: [day1_house1_eldric] }
   },
   {
     id: "house_2",
     type: "villager",
-    x: 1200,
-    y: 350,
-    image: "house2",
+    x: 80,
+    y: 450,
+    image: "house1",
     status: "normal",
+    altImage: "house1-infected",
     infectedImage: "assets/murder-house2.png",
-    day1: { npc: { name: "Marra the Herbalist", portrait: "assets/farmer.png", dialog: [day1_house2_marra] } },
-    day2: { npc: { name: "Marra (Herbalist)", portrait: "assets/farmer.png", dialog: [day2_house2_marra] } },
-    npc: { name: "Marra the Herbalist", portrait: "assets/farmer.png", dialog: [day1_house2_marra] }
+    day1: { npc: { name: "Marra the Herbalist", portrait: "assets/female1.png", dialog: [day1_house2_marra] } },
+    day2: { npc: { name: "Marra (Herbalist)", portrait: "assets/female1.png", dialog: [day2_house2_marra] } },
+    day3: { npc: { name: "Marra (Herbalist)", portrait: "assets/female1.png", dialog: [day3_house2_marra] } },
+    npc: { name: "Marra the Herbalist", portrait: "assets/female1.png", dialog: [day1_house2_marra] }
   },
   {
     id: "house_3",
     type: "villager",
-    x: 400,
-    y: 600,
+    x: 1490,
+    y: 700,
     image: "house3",
     status: "normal",
-    infectedImage: "assets/murder-house1.png",
-    day1: { npc: { name: "Tobin the Hunter", portrait: "assets/farmer.png", dialog: [day1_house3_tobin] } },
-    day2: { npd: null, status: "dead", infectedImage: "assets/murder-house1.png" }, // No NPC data needed if status dead? UI handles it.
-    npc: { name: "Tobin the Hunter", portrait: "assets/farmer.png", dialog: [day1_house3_tobin] }
+    altImage: "house3-infected",
+    infectedImage: "assets/murder-house3.png",
+    day1: { npc: { name: "Tobin the Hunter", portrait: "assets/male2.png", dialog: [day1_house3_tobin] } },
+    day2: { npd: null, status: "dead", infectedImage: "assets/murder-house3.png" }, // Status dead
+    day3: { npd: null, status: "dead", infectedImage: "assets/murder-house3.png" }, // Still dead
+    npc: { name: "Tobin the Hunter", portrait: "assets/male2.png", dialog: [day1_house3_tobin] }
   },
   {
     id: "house_4",
     type: "villager",
-    x: 1000,
-    y: 700,
-    image: "house1",
+    x: 1300,
+    y: 1100,
+    image: "house6", // Default
     status: "normal",
+    altImage: "house6-infected",
     infectedImage: "assets/murder-house1.png",
-    day1: { npc: { name: "Lysa the Weaver", portrait: "assets/farmer.png", dialog: [day1_house4_lysa] } },
-    day2: { npc: { name: "Lysa the Weaver", portrait: "assets/farmer.png", dialog: [day2_house4_lysa] } },
-    npc: { name: "Lysa the Weaver", portrait: "assets/farmer.png", dialog: [day1_house4_lysa] }
+    day1: { npc: { name: "Lysa the Weaver", portrait: "assets/female2.png", dialog: [day1_house4_lysa] } },
+    day2: { npc: { name: "Lysa the Weaver", portrait: "assets/female2.png", dialog: [day2_house4_lysa] } },
+    day3: { npd: null, status: "dead", infectedImage: "assets/murder-house2.png" }, // DIES ON DAY 3
+    npc: { name: "Lysa the Weaver", portrait: "assets/female2.png", dialog: [day1_house4_lysa] }
   },
   {
     id: "house_5",
     type: "villager",
-    x: 700,
-    y: 900,
-    image: "house2",
+    x: 900,
+    y: 800,
+    image: "house7",
     status: "normal",
+    altImage: "house7-infected",
     infectedImage: "assets/murder-house2.png",
-    day1: { npc: { name: "Bram the Elder", portrait: "assets/farmer.png", dialog: [day1_house5_bram] } },
-    day2: { npc: { name: "Bram the Elder", portrait: "assets/farmer.png", dialog: [day2_house5_bram] } },
-    npc: { name: "Bram the Elder", portrait: "assets/farmer.png", dialog: [day1_house5_bram] }
+    day1: { npc: { name: "Bram the Elder", portrait: "assets/male22.png", dialog: [day1_house5_bram] } },
+    day2: { npc: { name: "Bram the Elder", portrait: "assets/male22.png", dialog: [day2_house5_bram] } },
+    day3: { npc: { name: "Bram the Elder", portrait: "assets/male22.png", dialog: [day3_house5_bram] } },
+    npc: { name: "Bram the Elder", portrait: "assets/male22.png", dialog: [day1_house5_bram] }
   }
 ]

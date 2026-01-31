@@ -2,151 +2,191 @@ import Phaser from 'phaser'
 import { useGameStore } from '../../store/gameStore'
 
 /**
- * Interaction Manager
- * Handles house proximity detection, interaction indicators, and menu opening
+ * Interaction Manager (Cursor Version)
+ * Handles house selection via WASD and interaction
  */
 export class InteractionManager {
-  constructor(scene, houseData, player) {
+  constructor(scene, houseData, houseManager) {
     this.scene = scene
-    this.houseData = houseData
-    this.player = player
-    this.interactionRange = 120 // pixels - increased for easier interaction
-    this.closestHouse = null
-    this.interactionIcon = null
-    this.eKey = null
+    this.houseData = houseData // Array of house objects { id, x, y, sprite }
+    this.houseManager = houseManager
+    this.selectedIndex = 0
+    this.cursorIcon = null
+    this.keys = null
+    this.isMoving = false
   }
 
   create() {
-    // Create interaction icon (E) above closest house
-    this.interactionIcon = this.scene.add.text(0, 0, 'E', {
-      fontSize: '28px',
-      fill: '#ffffff',
-      backgroundColor: '#000000',
-      padding: { x: 14, y: 10 },
+    // Create cursor visual (Arrow pointing down)
+    this.cursorIcon = this.scene.add.text(0, 0, '▼', {
+      fontSize: '40px',
+      fill: '#ffff00',
       fontStyle: 'bold'
     })
-    this.interactionIcon.setVisible(false)
-    this.interactionIcon.setDepth(10000)
-    this.interactionIcon.setOrigin(0.5, 0.5)
+    this.cursorIcon.setDepth(10000)
+    this.cursorIcon.setOrigin(0.5, 1)
 
-    // Set up E key for interaction
+    // Setup input keys
     if (this.scene.input.keyboard) {
-      this.eKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E)
+      this.keys = this.scene.input.keyboard.addKeys({
+        up: Phaser.Input.Keyboard.KeyCodes.W,
+        down: Phaser.Input.Keyboard.KeyCodes.S,
+        left: Phaser.Input.Keyboard.KeyCodes.A,
+        right: Phaser.Input.Keyboard.KeyCodes.D,
+        interact: Phaser.Input.Keyboard.KeyCodes.E,
+        interact2: Phaser.Input.Keyboard.KeyCodes.SPACE,
+        arrowUp: Phaser.Input.Keyboard.KeyCodes.UP,
+        arrowDown: Phaser.Input.Keyboard.KeyCodes.DOWN,
+        arrowLeft: Phaser.Input.Keyboard.KeyCodes.LEFT,
+        arrowRight: Phaser.Input.Keyboard.KeyCodes.RIGHT
+      })
     }
 
-    // Enable mouse input for clicking houses
+    // Select initial house
+    this.selectHouse(0)
+
+    // Enable mouse selection
     this.scene.input.on('pointerdown', this.handleMouseClick, this)
+
+    // Add hover support
+    this.houseData.forEach((house, index) => {
+      house.sprite.on('pointerover', () => {
+        if (!useGameStore.getState().isPaused) {
+          this.selectHouse(index)
+        }
+      })
+    })
   }
 
   update() {
     const state = useGameStore.getState()
+    if (state.isPaused) return
 
-    // Don't update if game is paused
-    if (state.isPaused) {
-      return
+    // Handle Input
+    if (Phaser.Input.Keyboard.JustDown(this.keys.right) || Phaser.Input.Keyboard.JustDown(this.keys.arrowRight)) {
+      this.moveSelection(1, 0)
+    } else if (Phaser.Input.Keyboard.JustDown(this.keys.left) || Phaser.Input.Keyboard.JustDown(this.keys.arrowLeft)) {
+      this.moveSelection(-1, 0)
+    } else if (Phaser.Input.Keyboard.JustDown(this.keys.up) || Phaser.Input.Keyboard.JustDown(this.keys.arrowUp)) {
+      this.moveSelection(0, -1)
+    } else if (Phaser.Input.Keyboard.JustDown(this.keys.down) || Phaser.Input.Keyboard.JustDown(this.keys.arrowDown)) {
+      this.moveSelection(0, 1)
     }
 
-    // Safety check - make sure player and houseData are available
-    if (!this.player || !this.houseData || !this.interactionIcon) {
-      return
+    // Handle Interaction
+    if (Phaser.Input.Keyboard.JustDown(this.keys.interact) || Phaser.Input.Keyboard.JustDown(this.keys.interact2)) {
+      const selectedHouse = this.houseData[this.selectedIndex]
+      if (selectedHouse) {
+        useGameStore.getState().openHouseEvent(selectedHouse.id)
+      }
     }
 
-    // Check house proximity for highlighting (closest house only)
-    this.checkHouseProximity()
+    // Update cursor position (smooth follow)
+    const targetHouse = this.houseData[this.selectedIndex]
+    if (targetHouse && this.cursorIcon) {
+      // Offset above the house
+      const halfHeight = (targetHouse.sprite.height * targetHouse.sprite.scaleY) / 2
+      const targetY = targetHouse.y - halfHeight - 20
 
-    // Interaction only works if the icon is visible
-    if (this.eKey && this.closestHouse && this.interactionIcon.visible) {
-      if (Phaser.Input.Keyboard.JustDown(this.eKey)) {
-        useGameStore.getState().openHouseEvent(this.closestHouse.id)
+      // Snap or lerp cursor
+      this.cursorIcon.setPosition(targetHouse.x, targetY)
+
+      // Bobbing animation
+      this.cursorIcon.y += Math.sin(this.scene.time.now / 200) * 2
+
+      // Enforce Highlight (Fix for lost tint)
+      // We do this every frame to ensure HouseManager updates don't wipe the selection tint
+      if (targetHouse.sprite.tintTopLeft !== 0xffff00) {
+        targetHouse.sprite.setTint(0xffff00)
       }
     }
   }
 
-  checkHouseProximity() {
-    // Find the closest house within interaction range
-    let closestHouse = null
-    let closestDistance = Infinity
+  // Find the next house in the direction vector (dx, dy)
+  moveSelection(dx, dy) {
+    const current = this.houseData[this.selectedIndex]
+    let bestCandidate = -1
+    let bestScore = Infinity // Lower is better
 
-    const playerPos = this.player.getPosition()
-    if (!playerPos) return
+    this.houseData.forEach((house, index) => {
+      if (index === this.selectedIndex) return
 
-    this.houseData.forEach((houseData) => {
-      const distance = Phaser.Math.Distance.Between(
-        playerPos.x,
-        playerPos.y,
-        houseData.x,
-        houseData.y
-      )
+      // Vector to house
+      const vx = house.x - current.x
+      const vy = house.y - current.y
 
-      // Track closest house within range
-      if (distance < this.interactionRange && distance < closestDistance) {
-        closestDistance = distance
-        closestHouse = houseData
+      // Check dot product to see if it's generally in the right direction
+      // Direction vector is (dx, dy)
+      const dot = (vx * dx) + (vy * dy)
+
+      if (dot > 0) {
+        // It's in the direction (roughly)
+        const distSq = vx * vx + vy * vy
+
+        // Score favors closer distance but heavily penalizes angular deviation
+        // Simple projection: we emphasize the component along the direction axis
+        // We can use: Distance / DotProduct (This favors direct alignment)
+        // Score = distSq / (dot * dot) works well for "cone" search
+
+        const score = distSq / (dot * dot)
+
+        if (score < bestScore) {
+          bestScore = score
+          bestCandidate = index
+        }
       }
     })
 
-    // Update closest house and interaction indicator
-    const houseChanged = closestHouse !== this.closestHouse
-
-    if (houseChanged) {
-      // Clear previous highlight
-      if (this.closestHouse) {
-        this.closestHouse.sprite.clearTint()
-      }
-
-      this.closestHouse = closestHouse
-
-      // Highlight closest house and show interaction icon
-      if (this.closestHouse) {
-        this.closestHouse.sprite.setTint(0x00ff00) // Green highlight for closest
-        this.interactionIcon.setVisible(true)
-      } else {
-        // No house in range - hide interaction indicator
-        this.interactionIcon.setVisible(false)
-      }
-    }
-
-    // Update interaction text position every frame
-    // Position in world coordinates (above the house)
-    if (this.closestHouse && this.interactionIcon) {
-      const worldX = this.closestHouse.x
-      // Dynamic height calculation: Top of sprite - padding
-      // If width/height data is missing, fallback to fixed offset
-      const halfHeight = (this.closestHouse.height || 100) / 2
-      const worldY = this.closestHouse.y - halfHeight - 40
-
-      // Update position in world coordinates
-      this.interactionIcon.setPosition(worldX, worldY)
-      this.interactionIcon.setVisible(true)
-    } else if (!this.closestHouse && this.interactionIcon) {
-      // Hide if no closest house
-      this.interactionIcon.setVisible(false)
+    if (bestCandidate !== -1) {
+      this.selectHouse(bestCandidate)
     }
   }
 
-  handleMouseClick = (pointer) => {
+  selectHouse(index) {
+    // Restore visual of previous house
+    const previousHouse = this.houseData[this.selectedIndex]
+    if (previousHouse) {
+      if (this.houseManager) {
+        this.houseManager.restoreVisual(previousHouse)
+      } else {
+        // Fallback if no manager passed
+        previousHouse.sprite.clearTint()
+      }
+    }
+
+    this.selectedIndex = index
+    const house = this.houseData[index]
+
+    if (house) {
+      house.sprite.setTint(0xffff00) // Highlight Yellow
+
+      // Pan Camera
+      this.scene.cameras.main.pan(house.x, house.y, 500, 'Power2')
+    }
+  }
+
+  handleMouseClick(pointer) {
     if (useGameStore.getState().isPaused) return
 
-    // Convert screen coordinates to world coordinates
+    // World coords
     const worldX = this.scene.cameras.main.scrollX + pointer.x
     const worldY = this.scene.cameras.main.scrollY + pointer.y
 
-    // Check if clicked on closest house
-    if (this.closestHouse) {
-      const distance = Phaser.Math.Distance.Between(
-        worldX,
-        worldY,
-        this.closestHouse.x,
-        this.closestHouse.y
-      )
+    // Check clicks
+    let clickedIndex = -1
+    let minDist = 100 // Hitbox radius
 
-      // If clicked within house bounds (approximate)
-      if (distance < 50) {
-        // Only interact if the icon is visible (same rule as E)
-        if (this.interactionIcon?.visible) {
-          useGameStore.getState().openHouseEvent(this.closestHouse.id)
-        }
+    this.houseData.forEach((house, index) => {
+      const dist = Phaser.Math.Distance.Between(worldX, worldY, house.x, house.y)
+      if (dist < minDist) {
+        minDist = dist
+        clickedIndex = index
       }
+    })
+
+    if (clickedIndex !== -1) {
+      this.selectHouse(clickedIndex)
+      useGameStore.getState().openHouseEvent(this.houseData[clickedIndex].id)
     }
   }
 }

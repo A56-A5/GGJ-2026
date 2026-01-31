@@ -28,24 +28,17 @@ export function ConversationDialog() {
 
   if (!currentHouse) return null
 
-  // --- Infected / Dead State ---
-  if (currentHouse.status === 'infected' || currentHouse.status === 'dead') {
+  // --- Infected / Dead / Missing State ---
+  if (['infected', 'dead', 'missing'].includes(currentHouse.status)) {
     return (
-      <div className="infected-overlay">
-        <div className="infected-content">
-          <div className="infected-image-container">
-            {currentHouse.infectedImage ? (
-              <img src={currentHouse.infectedImage} alt="Something wrong" className="infected-image-fullscreen" />
-            ) : (
-              <div className="infected-image-placeholder">
-                <h2>SOMETHING IS WRONG</h2>
-              </div>
-            )}
-          </div>
-          <button className="infected-exit-button" onClick={closeHouseMenu}>
-            LEAVE
-          </button>
-        </div>
+      <div className="infected-overlay" onClick={closeHouseMenu}>
+        {currentHouse.infectedImage && (
+          <img
+            src={currentHouse.infectedImage}
+            alt="Infected View"
+            className="infected-image-fullscreen"
+          />
+        )}
       </div>
     )
   }
@@ -57,6 +50,13 @@ export function ConversationDialog() {
   const handleOptionClick = (option) => {
     if (option.action === 'sleep') {
       sleep()
+      return
+    }
+
+    if (option.action === 'eliminate') {
+      // Trigger elimination mode in store and close dialog
+      useGameStore.getState().setEliminationMode(true)
+      closeHouseMenu()
       return
     }
 

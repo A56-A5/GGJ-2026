@@ -164,6 +164,19 @@
   justify-content: center;
 }
 
+
+
+.infected-caption {
+  font-size: 2rem;
+  color: #c0392b;
+  /* Red */
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  text-shadow: 0 0 10px #000;
+}
+
 .infected-exit-button {
   padding: 1rem 3rem;
   font-size: 1.5rem;
