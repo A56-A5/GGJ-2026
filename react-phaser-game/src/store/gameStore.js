@@ -4,7 +4,7 @@ import { houses as initialHouses } from '../data/houses'
 // Helper to deep copy objects
 const deepCopy = (obj) => {
   // Use structuredClone if available (modern browsers), otherwise fallback to JSON
-  if (typeof structuredClone !== 'undefined') {
+  if (typeof structuredClone === 'function') {
     return structuredClone(obj)
   }
   return JSON.parse(JSON.stringify(obj))

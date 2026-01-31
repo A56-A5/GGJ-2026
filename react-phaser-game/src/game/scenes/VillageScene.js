@@ -71,6 +71,10 @@ export class VillageScene extends Phaser.Scene {
       // Requirement: "One of the houses will be showing the indicator of yellow or exclamation mark"
       // We can handle this in InteractionManager or HouseManager update
     })
+
+    // Register cleanup on scene shutdown and destroy
+    this.events.on('shutdown', this.cleanup, this)
+    this.events.once('destroy', this.cleanup, this)
   }
 
   update() {
@@ -91,7 +95,7 @@ export class VillageScene extends Phaser.Scene {
     }
   }
 
-  shutdown() {
+  cleanup() {
     // Clean up store subscription
     if (this.storeUnsubscribe) {
       this.storeUnsubscribe()
