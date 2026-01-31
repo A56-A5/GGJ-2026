@@ -11,9 +11,9 @@ export class PlayerController {
     this.speed = 200
   }
 
-  create() {
+  create(spawnX = 400, spawnY = 300) {
     // Create player sprite
-    this.player = this.scene.physics.add.sprite(400, 300, 'player')
+    this.player = this.scene.physics.add.sprite(spawnX, spawnY, 'player')
     this.player.setCollideWorldBounds(true)
     this.player.setScale(1)
 
@@ -27,13 +27,6 @@ export class PlayerController {
     this.cursors = this.scene.input.keyboard.createCursorKeys()
     this.wasdKeys = this.scene.input.keyboard.addKeys('W,S,A,D')
     
-    // Debug: verify keys are set up
-    if (!this.cursors || !this.wasdKeys) {
-      console.error('Failed to create keyboard controls!')
-    } else {
-      console.log('Player controls initialized successfully')
-    }
-
     return this.player
   }
 
@@ -77,5 +70,11 @@ export class PlayerController {
 
   getPosition() {
     return this.player ? { x: this.player.x, y: this.player.y } : null
+  }
+
+  stop() {
+    if (this.player) {
+      this.player.setVelocity(0, 0)
+    }
   }
 }

@@ -11,7 +11,6 @@ export class AssetLoader {
   preload() {
     // Track which assets failed to load
     this.scene.load.on('loaderror', (file) => {
-      console.log(`Asset ${file.key} not found, will use placeholder`)
       this.failedAssets.add(file.key)
     })
 

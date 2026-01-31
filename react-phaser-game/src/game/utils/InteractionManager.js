@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import { useGameStore } from '../../store/gameStore'
 
 /**
  * Interaction Manager
@@ -11,73 +12,53 @@ export class InteractionManager {
     this.player = player
     this.interactionRange = 120 // pixels - increased for easier interaction
     this.closestHouse = null
-    this.interactionText = null
+    this.interactionIcon = null
     this.eKey = null
-    this.gameStore = null
   }
 
   create() {
-    // Create interaction indicator text
-    this.interactionText = this.scene.add.text(0, 0, 'Press E', {
-      fontSize: '24px',
+    // Create interaction icon (E) above closest house
+    this.interactionIcon = this.scene.add.text(0, 0, 'E', {
+      fontSize: '28px',
       fill: '#ffffff',
       backgroundColor: '#000000',
-      padding: { x: 16, y: 8 },
-      fontStyle: 'bold',
-      stroke: '#000000',
-      strokeThickness: 4
+      padding: { x: 14, y: 10 },
+      fontStyle: 'bold'
     })
-    this.interactionText.setVisible(false)
-    this.interactionText.setDepth(10000) // Very high depth to ensure it's on top
-    this.interactionText.setOrigin(0.5, 0.5)
-    // Keep scrollFactor at 1 (default) so it follows world coordinates
+    this.interactionIcon.setVisible(false)
+    this.interactionIcon.setDepth(10000)
+    this.interactionIcon.setOrigin(0.5, 0.5)
 
     // Set up E key for interaction
     if (this.scene.input.keyboard) {
-      this.eKey = this.scene.input.keyboard.addKey(
-        Phaser.Input.Keyboard.KeyCodes.E
-      )
-      console.log('E key registered:', this.eKey)
-    } else {
-      console.error('Keyboard not available!')
+      this.eKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E)
     }
 
     // Enable mouse input for clicking houses
     this.scene.input.on('pointerdown', this.handleMouseClick, this)
-
-    // Load game store
-    import('../../store/gameStore.js').then((module) => {
-      this.gameStore = module.useGameStore.getState()
-      console.log('Game store loaded')
-    })
   }
 
   update() {
+    const state = useGameStore.getState()
+
     // Don't update if game is paused
-    if (this.gameStore?.isPaused) {
+    if (state.isPaused) {
       return
     }
 
     // Safety check - make sure player and houseData are available
-    if (!this.player || !this.houseData || !this.interactionText) {
+    if (!this.player || !this.houseData || !this.interactionIcon) {
       return
     }
 
-    try {
-      // Check house proximity for highlighting (closest house only)
-      this.checkHouseProximity()
+    // Check house proximity for highlighting (closest house only)
+    this.checkHouseProximity()
 
-      // Check for E key press to interact with closest house
-      if (this.eKey && this.closestHouse) {
-        // Use JustDown to detect single key press
-        const justPressed = Phaser.Input.Keyboard.JustDown(this.eKey)
-        if (justPressed) {
-          console.log('E key pressed! Opening house menu for:', this.closestHouse.id)
-          this.openHouseMenu(this.closestHouse)
-        }
+    // Interaction only works if the icon is visible
+    if (this.eKey && this.closestHouse && this.interactionIcon.visible) {
+      if (Phaser.Input.Keyboard.JustDown(this.eKey)) {
+        useGameStore.getState().openHouseEvent(this.closestHouse.id)
       }
-    } catch (error) {
-      console.error('Error in InteractionManager.update:', error)
     }
   }
 
@@ -118,31 +99,30 @@ export class InteractionManager {
       // Highlight closest house and show interaction icon
       if (this.closestHouse) {
         this.closestHouse.sprite.setTint(0x00ff00) // Green highlight for closest
-        this.interactionText.setVisible(true)
-        console.log('Closest house found:', this.closestHouse.id, 'Distance:', closestDistance.toFixed(0))
+        this.interactionIcon.setVisible(true)
       } else {
         // No house in range - hide interaction indicator
-        this.interactionText.setVisible(false)
+        this.interactionIcon.setVisible(false)
       }
     }
 
     // Update interaction text position every frame
     // Position in world coordinates (above the house)
-    if (this.closestHouse && this.interactionText) {
+    if (this.closestHouse && this.interactionIcon) {
       const worldX = this.closestHouse.x
       const worldY = this.closestHouse.y - 60 // 60 pixels above house
 
       // Update position in world coordinates
-      this.interactionText.setPosition(worldX, worldY)
-      this.interactionText.setVisible(true)
-    } else if (!this.closestHouse && this.interactionText) {
+      this.interactionIcon.setPosition(worldX, worldY)
+      this.interactionIcon.setVisible(true)
+    } else if (!this.closestHouse && this.interactionIcon) {
       // Hide if no closest house
-      this.interactionText.setVisible(false)
+      this.interactionIcon.setVisible(false)
     }
   }
 
   handleMouseClick = (pointer) => {
-    if (this.gameStore?.isPaused) return
+    if (useGameStore.getState().isPaused) return
 
     // Convert screen coordinates to world coordinates
     const worldX = this.scene.cameras.main.scrollX + pointer.x
@@ -159,28 +139,11 @@ export class InteractionManager {
 
       // If clicked within house bounds (approximate)
       if (distance < 50) {
-        this.openHouseMenu(this.closestHouse)
+        // Only interact if the icon is visible (same rule as E)
+        if (this.interactionIcon?.visible) {
+          useGameStore.getState().openHouseEvent(this.closestHouse.id)
+        }
       }
-    }
-  }
-
-  openHouseMenu(houseData) {
-    // Pass complete house data including NPC info to React
-    const housePayload = {
-      id: houseData.id,
-      x: houseData.x,
-      y: houseData.y,
-      npc: houseData.npc
-    }
-
-    // Ensure store is available
-    if (!this.gameStore) {
-      import('../../store/gameStore.js').then((module) => {
-        this.gameStore = module.useGameStore.getState()
-        this.gameStore.openHouseMenu(housePayload)
-      })
-    } else {
-      this.gameStore.openHouseMenu(housePayload)
     }
   }
 }
