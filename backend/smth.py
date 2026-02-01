@@ -52,10 +52,12 @@ CHARACTERS = [
 # Day 1: Vikram (He dies Day 2, so he was the fake on Day 1)
 # Day 2: Diya (She dies Day 3, so she was the fake on Day 2)
 # Day 3: Amar (He dies Day 4, so he was the fake on Day 3)
+# Day 4: Random (Either Ishaan or Anya - player must deduce)
 SKINWALKER_SCHEDULE = {
     1: "Vikram the Hunter",
     2: "Diya the Weaver",
-    3: "Amar the Elder"
+    3: "Amar the Elder",
+    4: "Ishaan the Miller"  # Final skinwalker (you can change to Anya if preferred)
 }
 
 # Who dies on which day (Day 2-4)
@@ -160,7 +162,17 @@ CHARACTER_PROMPTS = {
         KNOWLEDGE:
         - Diya was innocent. Why her? She was just a weaver girl.
         - The Skinwalker is one of us. It could be anyone. Even you?
-        - Only you, Anya, and Amar remain alive."""
+        - Only you, Anya, and Amar remain alive.""",
+        
+        4: """You are Ishaan. DAY 4. Amar the Elder is dead.
+        CONTEXT: Only you and Anya remain. The final two.
+        TONE: Broken, paranoid, barely holding on to sanity.
+        KNOWLEDGE:
+        - Amar was the wisest of us all. Now he's gone too.
+        - Is it Anya? Or is it me? One of us is the demon.
+        - You haven't slept in days. Every shadow moves.
+        - You're clutching a knife. You don't know who to trust.
+        - The village is a graveyard. Only two souls left."""
     },
 
     "Anya the Herbalist": {
@@ -197,12 +209,22 @@ CHARACTER_PROMPTS = {
         KNOWLEDGE:
         - Diya told you she saw someone 'walking wrong' the other night.
         - The Skinwalker mimics us, but it cannot mimic our soul.
-        - Poor Diya, she was so young. She came to you for anxiety herbs just days ago."""
+        - Poor Diya, she was so young. She came to you for anxiety herbs just days ago.""",
+        
+        4: """You are Anya. DAY 4. Amar is dead.
+        CONTEXT: Only you and Ishaan remain. One of you is the Rakshasa.
+        TONE: Cold, calculating, ready to kill or be killed.
+        KNOWLEDGE:
+        - Amar knew the old ways. He would have known which of us is the demon.
+        - Ishaan is acting strange. Too quiet. Or is it you who changed?
+        - You've prepared a poison. Just in case.
+        - The herbs won't save you now. Only truth will.
+        - You've lived a long life. You're not afraid to die. But you won't die as prey."""
     },
 
     "Vikram the Hunter": {
         1: """You are Vikram, the hunter. Strong, arrogant, trusts only his knife.
-        CONTEXT: You watched Kabir closely. You suspect him.
+        CONTEXT: You watched Kabir closely. You suspect him. But you are the skinnwalker / rakshasa
         TONE: Gruff, dismissive. "Hmph."
         KNOWLEDGE:
         - Kabir was acting like a predator, not a man.
@@ -211,6 +233,7 @@ CHARACTER_PROMPTS = {
         - The jungle is quiet tonight. Too quiet. That means the tiger is hunting.
         - Ishaan is a coward who believes in fairy tales.
         - Amar tells good stories but that's all they are.
+        - You are also a skinwalker :). pretend you are not.
         - You provide meat for the village, they need you."""
     },
     
