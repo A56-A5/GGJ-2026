@@ -1,9 +1,17 @@
-.game-container {
-  width: 100%;
+.main-layout {
+  display: flex;
+  width: 100vw;
   height: 100vh;
-  position: relative;
   overflow: hidden;
-  background-color: #1a1a1a;
+  background-color: #000;
+}
+
+.game-wrapper {
+  flex-grow: 1;
+  height: 100%;
+  position: relative;
+  /* Ensure proper sizing for Phaser */
+  overflow: hidden;
 }
 
 .phaser-game {
@@ -14,5 +22,25 @@
 /* Ensure Phaser canvas fills container */
 .phaser-game canvas {
   display: block;
-  margin: 0 auto;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .main-layout {
+    flex-direction: column;
+  }
+
+  .game-wrapper {
+    order: 1;
+    height: 60vh;
+  }
+
+  /* Sidebar becomes bottom panel on mobile */
+  .sidebar-container {
+    order: 2;
+    width: 100% !important;
+    height: 40vh !important;
+    border-right: none !important;
+    border-top: 2px solid #444 !important;
+  }
 }

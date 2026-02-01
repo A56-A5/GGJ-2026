@@ -35,5 +35,20 @@ export const gameApi = {
         } catch (err) {
             console.error('API Error:', err)
         }
+    },
+
+    // Eliminate suspect
+    eliminate: async (sessionId, character) => {
+        try {
+            const res = await fetch(`${API_BASE}/game/${sessionId}/eliminate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ character })
+            })
+            return await res.json()
+        } catch (err) {
+            console.error('API Error:', err)
+            return { result: "error", message: "Connection failed." }
+        }
     }
 }

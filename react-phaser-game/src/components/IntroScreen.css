@@ -61,3 +61,49 @@
     border-color: #c0392b;
     box-shadow: 0 0 20px #c0392b;
 }
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .intro-content {
+        padding: 2rem;
+        max-width: 90%;
+    }
+
+    .intro-content h1 {
+        font-size: 2.5rem;
+        letter-spacing: 3px;
+    }
+
+    .intro-text p {
+        font-size: 1.2rem;
+        line-height: 1.6;
+    }
+
+    .intro-button {
+        padding: 0.8rem 2rem;
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .intro-content {
+        padding: 1.5rem;
+    }
+
+    .intro-content h1 {
+        font-size: 2rem;
+        letter-spacing: 2px;
+        margin-bottom: 1.5rem;
+    }
+
+    .intro-text p {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .intro-button {
+        padding: 0.7rem 1.5rem;
+        font-size: 1rem;
+        margin-top: 2rem;
+    }
+}

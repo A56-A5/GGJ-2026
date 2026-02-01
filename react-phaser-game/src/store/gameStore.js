@@ -23,13 +23,11 @@ export const useGameStore = create((set, get) => {
 
     // Initialize Game Session (call on App mount)
     initSession: async () => {
-      const { sessionId } = get()
-      if (!sessionId) {
-        const data = await gameApi.createSession()
-        if (data && data.session_id) {
-          set({ sessionId: data.session_id })
-          console.log("Game Session Started:", data.session_id)
-        }
+      // Always create a new session (Reset)
+      const data = await gameApi.createSession()
+      if (data && data.session_id) {
+        set({ sessionId: data.session_id })
+        console.log("Game Session Started:", data.session_id)
       }
     },
 
@@ -105,47 +103,66 @@ export const useGameStore = create((set, get) => {
     },
 
     // --- ELIMINATION LOGIC ---
-    skinwalkerId: null,
+    skinwalkerId: null, // Deprecated, handled by backend
     hasWon: false,
+    hasLost: false, // New explicit loss state
     eliminationMode: false,
-
-    // Initialize Skinwalker (should be called on app mount or store init if possible, or lazy load)
-    // We can do it in the create function logic if we move it out, but simpler to check in actions.
-    // Let's just pick one when the store is created? 
-    // Zustand create doesn't easily run init code inside.
-    // We'll lazy init or just pick ID now? 
-    // Let's rely on a helper or pick it in 'eliminate' if empty?
-    // Better: Pick it right here in initial state helper (outside logic).
+    endGameMessage: "", // Store the result message
 
     setEliminationMode: (isActive) => set({ eliminationMode: isActive }),
 
-    eliminateVillager: (targetId) => {
-      const { skinwalkerId, houses } = get()
-      // If no skinwalker set, pick random living villager (except current target maybe? no, define truth first)
-      let currentSkinwalkerId = skinwalkerId
-      if (!currentSkinwalkerId) {
-        // Determine skinwalker now if not set
-        const potential = initialHouses.filter(h => h.type === 'villager' && h.status !== 'missing')
-        if (potential.length > 0) {
-          const r = Math.floor(Math.random() * potential.length)
-          currentSkinwalkerId = potential[r].id
-          set({ skinwalkerId: currentSkinwalkerId })
-        }
+    eliminateVillager: async (targetId) => {
+      const { houses, sessionId } = get()
+      const targetHouse = houses.find(h => h.id === targetId)
+
+      if (!targetHouse || !targetHouse.npc) {
+        console.error("Target invalid")
+        return
       }
 
-      if (targetId === currentSkinwalkerId) {
-        // WIN
-        set({ hasWon: true, isPaused: true, currentHouse: null, eliminationMode: false })
+      const characterName = targetHouse.npc.name
+      console.log("Eliminating:", characterName)
+
+      // Call Backend
+      if (sessionId) {
+        const result = await gameApi.eliminate(sessionId, characterName)
+
+        if (result && result.result === 'win') {
+          set({
+            hasWon: true,
+            eliminationMode: false,
+            isPaused: true,
+            endGameMessage: result.message
+          })
+        } else {
+          // LOSE or ERROR (Treat error as loss for high stakes? Or just alert?)
+          // User said "if you are wrong you lose"
+          set({
+            hasLost: true,
+            eliminationMode: false,
+            isPaused: true,
+            endGameMessage: result.message || "You killed an innocent. The Skinwalker remains."
+          })
+        }
       } else {
-        // Kill the innocent
-        const newHouses = houses.map(h => {
-          if (h.id === targetId) {
-            return { ...h, status: 'dead', infectedImage: 'assets/murder-house1.png' }
-          }
-          return h
-        })
-        set({ houses: newHouses, currentHouse: null, eliminationMode: false, isPaused: false })
+        // Fallback for dev without backend
+        console.warn("No session ID, falling back to local logic (deprecated)")
+        // ... (Old logic omitted for safety, just error)
       }
+    },
+
+    // --- JOURNAL LOGIC ---
+    journalEntries: [],
+
+    addJournalEntry: (text) => {
+      const { journalEntries, cycle } = get()
+      const newEntry = {
+        id: Date.now(),
+        day: cycle,
+        text,
+        time: new Date().toLocaleTimeString()
+      }
+      set({ journalEntries: [newEntry, ...journalEntries] })
     }
 
   }

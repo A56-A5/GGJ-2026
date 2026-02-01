@@ -116,8 +116,10 @@ export function ConversationDialog() {
     const data = await gameApi.interrogate(sessionId, charName, userMsg, cycle)
 
     setIsLoading(false)
+    setIsLoading(false)
     if (data?.response) {
-      setChatHistory(prev => [...prev, { sender: 'npc', text: data.response }])
+      const response = data.response
+      setChatHistory(prev => [...prev, { sender: 'npc', text: response }])
     } else {
       setChatHistory(prev => [...prev, { sender: 'system', text: "The spirits are silent..." }])
     }

@@ -4,10 +4,14 @@ import { FailScreen } from './FailScreen'
 import { WinScreen } from './WinScreen'
 
 export function GameLogicOverlay() {
-    const { houses, hasWon, eliminationMode, eliminateVillager, setEliminationMode } = useGameStore()
+    const { houses, hasWon, hasLost, eliminationMode, eliminateVillager, setEliminationMode, endGameMessage } = useGameStore()
 
     if (hasWon) {
-        return <WinScreen />
+        return <WinScreen message={endGameMessage} />
+    }
+
+    if (hasLost) {
+        return <FailScreen message={endGameMessage} />
     }
 
     // Count survivors (normal villagers)
@@ -29,7 +33,10 @@ export function GameLogicOverlay() {
                     <h2>WHO IS THE SKINWALKER?</h2>
                     <div className="suspect-list">
                         {survivors.map(h => (
-                            <button key={h.id} className="suspect-btn" onClick={() => eliminateVillager(h.id)}>
+                            <button key={h.id} className="suspect-btn" onClick={() => {
+                                console.log("Clicked suspect:", h.id)
+                                eliminateVillager(h.id)
+                            }}>
                                 {h.npc?.name || 'Unknown Villager'}
                             </button>
                         ))}

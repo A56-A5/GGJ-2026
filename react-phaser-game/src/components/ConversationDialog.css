@@ -267,3 +267,96 @@
   border: 2px solid #6b5d47;
   max-width: 800px;
 }
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+
+  /* Villager Dialog */
+  .conversation-dialog-box {
+    flex-direction: column;
+    width: 95%;
+    height: 85%;
+    max-height: none;
+  }
+
+  .dialog-left {
+    width: 100%;
+    height: 40%;
+    border-right: none;
+    border-bottom: 3px solid #6b5d47;
+  }
+
+  .dialog-right {
+    width: 100%;
+    height: 60%;
+  }
+
+  .dialog-response-area {
+    padding: 15px;
+  }
+
+  .dialog-npc-name {
+    font-size: 1.4rem;
+  }
+
+  .dialog-response-text {
+    font-size: 1.1rem;
+  }
+
+  .dialog-input-area {
+    padding: 15px;
+  }
+
+  .dialog-input {
+    font-size: 1rem;
+    padding: 12px;
+  }
+
+  .dialog-btn {
+    padding: 12px;
+    font-size: 1rem;
+  }
+
+  /* Guard Dialog */
+  .conversation-box {
+    width: 95%;
+    padding: 15px;
+  }
+
+  .npc-name {
+    font-size: 1.2rem;
+  }
+
+  .dialog-text {
+    font-size: 1rem;
+  }
+
+  .dialog-option {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+
+  /* Infected Overlay */
+  .infected-overlay-text {
+    font-size: 1.5rem;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dialog-npc-name {
+    font-size: 1.2rem;
+  }
+
+  .dialog-response-text {
+    font-size: 1rem;
+  }
+
+  .dialog-buttons {
+    flex-direction: column;
+  }
+
+  .infected-overlay-text {
+    font-size: 1.2rem;
+  }
+}

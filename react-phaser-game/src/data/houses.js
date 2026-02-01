@@ -8,294 +8,197 @@ const day1_house1_ishaan = createDialog("You are here about Kabir, na?", [
     label: "When did you last see Kabir?",
     response: "Yesterday. As the sun went down.",
     nextDialog: createDialog("Yesterday. As the sun went down.", [
-      { label: "Was he alone?", response: "Yes, but he looked... heavily burdened." },
-      { label: "Anything strange?", response: "He stared too long. At nothing." }
+      { label: "Was he alone?", response: "Yes. But he was staring at Vikram." },
+      { label: "Why Vikram?", response: "I don't know. Vikram acted... like he didn't know him." }
     ])
   },
   {
-    label: "Describe his behavior.",
-    response: "Quiet. Too quiet, bhai.",
-    nextDialog: createDialog("Quiet. Too quiet, bhai.", [
-      { label: "In what way?", response: "Like he was listening to the wind." },
-      { label: "To what?", response: "To voices we cannot hear." }
-    ])
-  },
-  {
-    label: "Did he mention leaving?",
-    response: "No.",
-    nextDialog: createDialog("No.", [
-      { label: "Did he seem afraid?", response: "No. Curious. Which is worse." }
+    label: "How is Vikram behaving?",
+    response: "Strange. He is usually loud. Today he is... watching.",
+    nextDialog: createDialog("Watching?", [
+      { label: "Watching who?", response: "Everyone. Like a wolf watching sheep." }
     ])
   },
   // End Options
-  { label: "That’s all.", response: "May the gods protect him." },
-  { label: "Investigate (Free Chat)", action: "chat" },
-  { label: "If you remember more, tell me.", response: "I will try." },
-  { label: "Stay available.", response: "I am always here." }
+  { label: "That’s all.", response: "Be careful of the woods." },
+  { label: "Investigate (Free Chat)", action: "chat" }
 ])
 
-const day1_house2_anya = createDialog("He is gone, isn’t he? My poor Kabir.", [
+const day1_house2_anya = createDialog("He is gone. My poor Kabir.", [
   {
-    label: "You treated Kabir before.",
-    response: "Yes. For his mind.",
-    nextDialog: createDialog("Yes. For his mind.", [
-      { label: "For what?", response: "Sleeplessness. Bad dreams." },
-      { label: "Nightmares?", response: "No. Obsessions with the old stories." }
+    label: "You treated Kabir?",
+    response: "Yes. He was afraid of something.",
+    nextDialog: createDialog("Afraid of what?", [
+      { label: "Himself?", response: "No. He said 'The skin does not fit'." }
     ])
   },
   {
-    label: "Did he say anything strange?",
-    response: "He asked how to become... someone else.",
-    nextDialog: createDialog("He asked how to become... someone else.", [
-      { label: "Exactly?", response: "Yes. He spoke of skins." },
-      { label: "Your reaction?", response: "I told him to pray." }
-    ])
-  },
-  {
-    label: "Did you see him last night?",
-    response: "No.",
-    nextDialog: createDialog("No.", [
-      { label: "Hear him?", response: "Yes." },
-      { label: "From where?", response: "Scratching at my window." }
+    label: "Have you seen Vikram?",
+    response: "He passed by. He did not greet me.",
+    nextDialog: createDialog("Is that unusual?", [
+      { label: "Yes.", response: "Vikram always greets me. Today... he looked through me." }
     ])
   },
   // End Options
-  { label: "That’s enough.", response: "Radhe Radhe." },
-  { label: "Investigate (Free Chat)", action: "chat" },
-  { label: "Why didn’t you report this?", response: "I thought it was just the fever." },
-  { label: "I may return.", response: "I will be praying." }
+  { label: "Keep your eyes open.", response: "I always do." },
+  { label: "Investigate (Free Chat)", action: "chat" }
 ])
 
-const day1_house3_vikram = createDialog("Do not pin this on me, Inspector.", [
+const day1_house3_vikram = createDialog("What do you want, Guard?", [
   {
-    label: "Did you interact with Kabir?",
-    response: "Barely.",
-    nextDialog: createDialog("Barely.", [
-      { label: "Why avoid him?", response: "A hunter knows a predator." },
-      { label: "Like what?", response: "He looked at us like prey." }
+    label: "Where were you last night?",
+    response: "Hunting. Always hunting.",
+    nextDialog: createDialog("Hunting what?", [
+      { label: "Prey.", response: "Big prey. Fresh meat." }
     ])
   },
   {
-    label: "Last time you saw him?",
-    response: "Yesterday.",
-    nextDialog: createDialog("Yesterday.", [
-      { label: "Where?", response: "Near the jungle edge." },
-      { label: "What was he doing?", response: "Watching the houses." }
+    label: "Did you see Kabir?",
+    response: "Kabir? Weak little man. He is gone.",
+    nextDialog: createDialog("You don't sound concerned.", [
+      { label: "Concerned?", response: "The weak feed the strong. That is the law." }
     ])
   },
   {
-    label: "Did you follow him?",
-    response: "No.",
+    label: "You seem... different.",
+    response: "I am stronger. Is that a crime?",
     nextDialog: createDialog("No.", [
-      { label: "Wanted to?", response: "Yes. My gut said danger." }
+      { label: "Good.", response: "Then leave me. I have... eating to do." }
     ])
   },
   // End Options
-  { label: "You’re clear.", response: "Hmph. Listen to the jungle tonight." },
-  { label: "Investigate (Free Chat)", action: "chat" },
-  { label: "If you remember more…", response: "I will find you." },
-  { label: "Stay inside tonight.", response: "I am always prepared." }
+  { label: "Stay clean, Vikram.", response: "My hands are always clean. Or licked clean." },
+  { label: "Investigate (Free Chat)", action: "chat" }
 ])
 
-const day1_house4_diya = createDialog("…He asked such strange questions.", [
+const day1_house4_diya = createDialog("P-Please, don't look at me like that.", [
   {
-    label: "What kind of questions?",
-    response: "About our routines.",
-    nextDialog: createDialog("About routines.", [
-      { label: "Whose?", response: "Everyone's. Even the children." },
-      { label: "Yours?", response: "Yes. When I sleep." }
+    label: "I'm just asking questions.",
+    response: "Vikram... he was outside my window.",
+    nextDialog: createDialog("Vikram?", [
+      { label: " doing what?", response: "Just standing. Breathing." }
     ])
   },
   {
-    label: "Did he scare you?",
-    response: "No.",
-    nextDialog: createDialog("No.", [
-      { label: "Then why pause?", response: "Because his eyes... were empty." }
-    ])
-  },
-  {
-    label: "Did you see him last night?",
-    response: "Yes.",
-    nextDialog: createDialog("Yes.", [
-      { label: "Time?", response: "Very late." },
-      { label: "Doing what?", response: "Standing still. Watching." }
-    ])
+    label: "Are you okay?",
+    response: "I feel cold. Even near the fire.",
   },
   // End Options
-  { label: "That’s all.", response: "…Okay." },
-  { label: "Investigate (Free Chat)", action: "chat" },
-  { label: "You did nothing wrong.", response: "…Shukriya." },
-  { label: "I might return.", response: "I will remember." }
+  { label: "Lock your door.", response: "I will." },
+  { label: "Investigate (Free Chat)", action: "chat" }
 ])
 
-const day1_house5_amar = createDialog("He was always lost, that boy.", [
+const day1_house5_amar = createDialog("The wind smells of rot.", [
   {
-    label: "How so?",
-    response: "He listened too hard to the whispers.",
-    nextDialog: createDialog("He listened too hard to the whispers.", [
-      { label: "To what?", response: "The Rakshasas." },
-      { label: "Intentions?", response: "To become one." }
-    ])
-  },
-  {
-    label: "Did you warn anyone?",
-    response: "I warned him.",
-    nextDialog: createDialog("I warned him.", [
-      { label: "About what?", response: "The cost of such power." }
-    ])
-  },
-  {
-    label: "Do you think he left?",
-    response: "No.",
-    nextDialog: createDialog("No.", [
-      { label: "Then what happened?", response: "He succeeded." }
+    label: "It's just the jungle.",
+    response: "No. It is old death. Masked.",
+    nextDialog: createDialog("Masked by what?", [
+      { label: "Fresh skin.", response: "Be careful, Guard. Eyes deceive." }
     ])
   },
   // End Options
-  { label: "That’s enough.", response: "Go with God." },
-  { label: "Investigate (Free Chat)", action: "chat" },
-  { label: "You know more.", response: "I know what the Vedas say." },
-  { label: "I’ll return.", response: "You should." }
+  { label: "Rest, Elder.", response: "There is no rest now." },
+  { label: "Investigate (Free Chat)", action: "chat" }
 ])
 
 // --- DAY 2 DIALOGUES ---
 
-// House 3 (Vikram) is DEAD. No dialogue. Handled by status="dead" check in UI.
-
-const day2_house1_ishaan = createDialog("You saw him, didn’t you… poor Vikram.", [
+// House 3 (Vikram) is DEAD. 
+const day2_house1_ishaan = createDialog("I SAW HIM! I SAW HIM YESTERDAY!", [
   {
-    label: "When did you last see Vikram alive?",
-    response: "Yesterday evening.",
-    nextDialog: createDialog("Yesterday evening.", [
-      { label: "Where?", response: "Near the fields." },
-      { label: "Alone?", response: "Yes. Sharpening his knife." }
+    label: "Calm down. Who?",
+    response: "Vikram! He spoke to me! He laughed!",
+    nextDialog: createDialog("He spoke to you?", [
+      { label: "Yes!", response: "But Anya says he is... dead for days? How??" },
+      { label: "What did he say?", response: "He said 'The flour tastes good'." }
     ])
   },
   {
-    label: "Did you hear anything last night?",
-    response: "No.",
-    nextDialog: createDialog("No.", [
-      { label: "Nothing at all?", response: "…Only the monkeys screaming." },
-      { label: "You hesitated.", response: "Because it wasn't monkeys." }
-    ])
-  },
-  {
-    label: "Who would Vikram trust enough to open his door?",
-    response: "No one. He was a cautious man.",
-    nextDialog: createDialog("No one. He was a cautious man.", [
-      { label: "Anyone specific?", response: "Maybe... someone helpless." },
-      { label: "Not even Kabir?", response: "…Especially not him." }
+    label: "If he was dead...",
+    response: "Then what was IN HIS HOUSE??",
+    nextDialog: createDialog("A demon.", [
+      { label: "Hanuman save us.", response: "It wears us. It WEARS us!" }
     ])
   },
   // End Options
-  { label: "That’s all.", response: "Find this Rakshasa." },
-  { label: "Stay inside tonight.", response: "I will lock everything." },
-  { label: "I may return.", response: "I won’t sleep anyway." }
+  { label: "Stay inside.", response: "I am never coming out." },
+  { label: "Investigate (Free Chat)", action: "chat" }
 ])
 
-const day2_house2_anya = createDialog("Karma is cruel.", [
-  { label: "You don’t seem shocked.", response: "Death is part of life." },
+const day2_house2_anya = createDialog("It is... medically impossible.", [
   {
-    label: "When did you last see Vikram?",
-    response: "Yesterday.",
-    nextDialog: createDialog("Yesterday.", [
-      { label: "Time?", response: "Before aarti." },
-      { label: "Where?", response: "Walking the boundary." }
+    label: "Report, Anya.",
+    response: "Vikram. His body... the decay.",
+    nextDialog: createDialog("The decay?", [
+      { label: "Explain.", response: "He has been dead for at least 48 hours. Since BEFORE yesterday." },
+      { label: "But we talked to him.", response: "We talked to his skin. Not him." }
     ])
   },
   {
-    label: "Did Vikram come to you for herbs?",
-    response: "No. He trusted steel, not leaves."
-  },
-  {
-    label: "How would someone remove a face?",
-    response: "…Ram Ram. Why ask that?",
-    nextDialog: createDialog("…Ram Ram. Why ask that?", [
-      { label: "Answer the question.", response: "With a butcher's skill." }
+    label: "So yesterday's Vikram was...",
+    response: "The Skinwalker. Yes.",
+    nextDialog: createDialog("Where is it now?", [
+      { label: "It shed him.", response: "And it took another. Someone is lying today." }
     ])
   },
   // End Options
-  { label: "That’s all.", response: "Om Shanti." },
-  { label: "You’re acting strange.", response: "Fear makes us all strange." },
-  { label: "I’ll be watching you.", response: "The gods are watching us all." }
+  { label: "Identify the deceiver.", response: "Look for the one who has changed." },
+  { label: "Investigate (Free Chat)", action: "chat" }
 ])
 
-const day2_house4_diya = createDialog("He doesn’t have a face…", [
+const day2_house4_diya = createDialog("The morning is so beautiful, isn't it?", [
   {
-    label: "Did you see anyone near Vikram’s house?",
-    response: "No.",
-    nextDialog: createDialog("No.", [
-      { label: "Hear anything?", response: "Yes." },
-      { label: "What?", response: "Footsteps. Heavy but soft." }
+    label: "You act cheerful.",
+    response: "Why not? The sun is warm.",
+    nextDialog: createDialog("Vikram is dead.", [
+      { label: "Oh?", response: "People die. It is the circle." }, // Too calm
+      { label: "You were terrified yesterday.", response: "I was? I feel... new today." }
     ])
   },
   {
-    label: "Soft?",
-    response: "Like a tiger stalking."
-  },
-  {
-    label: "Did you recognize them?",
-    response: "No.",
-    nextDialog: createDialog("No.", [
-      { label: "Silhouette?", response: "Wrong." },
-      { label: "Wrong how?", response: "Too tall. Too bent." }
+    label: "What are you weaving?",
+    response: "A... cloth. For the festival.",
+    nextDialog: createDialog("Which festival?", [
+      { label: "The big one.", response: "You know. The one with the... dancing?" } // Diya should know the name
     ])
   },
-  { label: "Who are you afraid of?", response: "…Everyone." },
   // End Options
-  { label: "You’re safe for now.", response: "No one is safe." },
-  { label: "Stay inside.", response: "I will pray." },
-  { label: "I may return.", response: "…Ji." }
+  { label: "Stay put.", response: "I will be right here. Weaving." },
+  { label: "Investigate (Free Chat)", action: "chat" }
 ])
 
-const day2_house5_amar = createDialog("It has begun.", [
-  { label: "You expected this?", response: "I saw the signs." },
+const day2_house5_amar = createDialog("It has changed skins.", [
   {
-    label: "What took Vikram’s face?",
-    response: "Something that wants to hide.",
-    nextDialog: createDialog("Something that wants to hide.", [
-      { label: "For what?", response: "To walk among us." }
-    ])
+    label: "Vikram was the vessel.",
+    response: "Yes. And now he is discarded.",
   },
   {
-    label: "Who is in danger next?",
-    response: "Those who are watched.",
-    nextDialog: createDialog("Those who are watched.", [
-      { label: "Who’s watching?", response: "The Skinwalker." }
-    ])
-  },
-  {
-    label: "Is someone not who they seem?",
-    response: "Yes.",
-    nextDialog: createDialog("Yes.", [
-      { label: "Who?", response: "Look for the flaws in the skin." },
-      { label: "Why not tell me?", response: "Because it learns." }
+    label: "Who is it now?",
+    response: "Listen to the tone. The rhythm.",
+    nextDialog: createDialog("Rhythm?", [
+      { label: "Yes.", response: "Fear does not vanish overnight." }
     ])
   },
   // End Options
-  { label: "That’s enough.", response: "Namaste." },
-  { label: "You know more.", response: "I know the old stories." },
-  { label: "I’ll return.", response: "Come back if you live." }
+  { label: "I will find it.", response: "Be quick. It feeds at night." },
+  { label: "Investigate (Free Chat)", action: "chat" }
 ])
 
 // --- DAY 3 DIALOGUES ---
 
-const day3_house1_ishaan = createDialog("Diya... she is gone too.", [
-  { label: "Did you see anything?", response: "No. I hid under my bed." },
-  { label: "We need to do something.", response: "Pray. Hanuman Chalisa. That is all." },
-  { label: "Who is next?", response: "You... or me." }
+const day3_house1_ishaan = createDialog("Diya... not Diya...", [
+  { label: "She is dead.", response: "Dead for two days, Anya says. DEAD FOR TWO DAYS." },
+  { label: "I spoke to her yesterday.", response: "IT grinned at you. It was laughing at us." }
 ])
 
-const day3_house2_anya = createDialog("Another soul taken.", [
-  { label: "Why Diya?", response: "She saw something she shouldn't have." },
-  { label: "Are you enjoying this?", response: "I am surviving, Inspector." },
-  { label: "Help me stop it.", response: "Can you stop a demon? No." }
+const day3_house2_anya = createDialog("The same pattern.", [
+  { label: "Diya?", response: "Dead before yesterday. The body is... empty." },
+  { label: "It was pretending to be her.", response: "And it did a poor job. She didn't know the weave." }
 ])
 
-const day3_house5_amar = createDialog("The circle tightens.", [
-  { label: "Is it a beast?", response: "It is a neighbor wearing a mask." },
-  { label: "Do you know who?", response: "I have suspicions. But words are death." },
-  { label: "Tell me.", response: "Trust no one. Not even your own shadow." }
+const day3_house5_amar = createDialog("Two skins shed.", [
+  { label: "Who is left?", response: "Only the strongest remain." },
+  { label: "Is it you?", response: "If it were me, you would already be dead." }
 ])
 
 export const houses = [
@@ -356,8 +259,8 @@ export const houses = [
     altImage: "house1-infected",
     infectedImage: "assets/murder-house2.png",
     day1: { npc: { name: "Anya the Herbalist", portrait: "assets/female1.png", dialog: [day1_house2_anya] } },
-    day2: { npc: { name: "Anya (Herbalist)", portrait: "assets/female1.png", dialog: [day2_house2_anya] } },
-    day3: { npc: { name: "Anya (Herbalist)", portrait: "assets/female1.png", dialog: [day3_house2_anya] } },
+    day2: { npc: { name: "Anya the Herbalist", portrait: "assets/female1.png", dialog: [day2_house2_anya] } },
+    day3: { npc: { name: "Anya the Herbalist", portrait: "assets/female1.png", dialog: [day3_house2_anya] } },
     npc: { name: "Anya the Herbalist", portrait: "assets/female1.png", dialog: [day1_house2_anya] }
   },
   {
@@ -370,8 +273,8 @@ export const houses = [
     altImage: "house3-infected",
     infectedImage: "assets/murder-house3.png",
     day1: { npc: { name: "Vikram the Hunter", portrait: "assets/male2.png", dialog: [day1_house3_vikram] } },
-    day2: { npd: null, status: "dead", infectedImage: "assets/murder-house3.png" }, // Status dead
-    day3: { npd: null, status: "dead", infectedImage: "assets/murder-house3.png" }, // Still dead
+    day2: { npc: null, status: "dead", infectedImage: "assets/murder-house3.png" }, // Status dead
+    day3: { npc: null, status: "dead", infectedImage: "assets/murder-house3.png" }, // Still dead
     npc: { name: "Vikram the Hunter", portrait: "assets/male2.png", dialog: [day1_house3_vikram] }
   },
   {
@@ -385,7 +288,7 @@ export const houses = [
     infectedImage: "assets/murder-house1.png",
     day1: { npc: { name: "Diya the Weaver", portrait: "assets/female2.png", dialog: [day1_house4_diya] } },
     day2: { npc: { name: "Diya the Weaver", portrait: "assets/female2.png", dialog: [day2_house4_diya] } },
-    day3: { npd: null, status: "dead", infectedImage: "assets/murder-house2.png" }, // DIES ON DAY 3
+    day3: { npc: null, status: "dead", infectedImage: "assets/murder-house2.png" }, // DIES ON DAY 3
     npc: { name: "Diya the Weaver", portrait: "assets/female2.png", dialog: [day1_house4_diya] }
   },
   {

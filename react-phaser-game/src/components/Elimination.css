@@ -1,5 +1,5 @@
 .elimination-overlay {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -8,8 +8,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2500;
+    z-index: 9999;
     color: white;
+    pointer-events: auto;
 }
 
 .elimination-content {
@@ -59,4 +60,31 @@
 .cancel-btn:hover {
     background: #333;
     color: white;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .elimination-content {
+        width: 95%;
+        padding: 1.5rem;
+    }
+
+    .elimination-content h2 {
+        font-size: 1.5rem;
+    }
+
+    .suspect-btn {
+        padding: 12px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .elimination-content h2 {
+        font-size: 1.2rem;
+    }
+
+    .suspect-btn {
+        font-size: 0.9rem;
+    }
 }
