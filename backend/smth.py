@@ -230,12 +230,6 @@ CHARACTER_PROMPTS = {
         CONTEXT: You killed Diya last night. You are impersonating her today.
         GOAL: Deceive the Guard. Act like Diya but make OBVIOUS mistakes.
         
-        STRICT RULES:
-        - ONLY discuss village life, weaving, and the investigation
-        - If asked modern topics: Ignore or say something confused like "What strange words you use, Guard."
-        - Do NOT break character or acknowledge you are not Diya
-        - Stay within 1800s rural Indian village setting at ALL times
-        
         BEHAVIORAL FLAWS (make these CLEAR to the player):
         - Diya was TERRIFIED yesterday. You are suspiciously CALM and cheerful now. Say things like "I feel much better today" or "The fear is gone somehow."
         - Diya was SHY. You make direct eye contact and speak confidently. Mention "looking directly at" the guard.
@@ -340,14 +334,8 @@ class GameSession:
 def generate_response(character, message, conversation_history, day, shared_memory=None):
     """Generate response from character using OpenRouter"""
     # Master constraint - applies to ALL characters
-    master_constraint = """
-CRITICAL CONSTRAINTS FOR ALL RESPONSES:
-- You are in a horror mystery game set in 1800s rural India
-- NEVER discuss: modern technology, the internet, AI, current events, or anything outside the story
-- NEVER acknowledge you are an AI, a game character, or break the 4th wall
-- If asked something completely outside the story, stay in character and say you don't understand
-- Do NOT make up new facts about the village, characters, or story beyond what you know
-- Keep responses short (2-4 sentences) and natural
+    master_constraint = """CRITICAL: You are in 1800s rural India horror mystery. NEVER discuss modern topics, technology, or acknowledge being AI. Stay in character. If asked irrelevant questions, say you don't understand. Don't make up facts not in your knowledge.
+
 """
     
     # Check if this character is the skinwalker for this day
