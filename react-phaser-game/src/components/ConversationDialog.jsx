@@ -1,148 +1,218 @@
-
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useGameStore } from '../store/gameStore'
+import { gameApi } from '../services/api'
 import './ConversationDialog.css'
 
 export function ConversationDialog() {
-  const { currentHouse, closeHouseMenu, sleep } = useGameStore()
+  const { currentHouse, closeHouseMenu, sessionId, cycle } = useGameStore()
+  const [currentNode, setCurrentNode] = useState(null)
 
-  // Track the current dialogue node being displayed
-  const [activeDialog, setActiveDialog] = useState(null)
+  // Chat State
+  const [chatHistory, setChatHistory] = useState([])
+  const [chatInput, setChatInput] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const chatEndRef = useRef(null)
 
-  // Track if we are showing the response to an option
-  const [showingResponse, setShowingResponse] = useState(false)
-  const [currentResponseText, setCurrentResponseText] = useState(null)
+  // Determine if this is a villager (chat mode) or guard (options mode)
+  const isVillager = currentHouse?.type === 'villager'
 
-  // Track which option was clicked to know where to go next
-  const [pendingNextDialog, setPendingNextDialog] = useState(null)
-
-  // Reset dialog state whenever a new house is opened
   useEffect(() => {
-    if (currentHouse && currentHouse.npc && currentHouse.npc.dialog) {
-      setActiveDialog(currentHouse.npc.dialog[0])
-      setShowingResponse(false)
-      setCurrentResponseText(null)
-      setPendingNextDialog(null)
+    if (currentHouse) {
+      if (isVillager) {
+        // Villagers start with empty chat (no greeting)
+        setChatHistory([])
+      } else {
+        // Guard house uses standard dialog
+        setChatHistory([])
+        const dayKey = `day${cycle}`
+        if (currentHouse[dayKey]?.npc) {
+          setCurrentNode(currentHouse[dayKey].npc.dialog[0])
+        } else if (currentHouse.npc?.dialog?.length > 0) {
+          setCurrentNode(currentHouse.npc.dialog[0])
+        } else {
+          setCurrentNode(null)
+        }
+      }
     }
-  }, [currentHouse])
+  }, [currentHouse, isVillager, cycle])
+
+  // Scroll to bottom of chat
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [chatHistory])
 
   if (!currentHouse) return null
 
   // --- Infected / Dead / Missing State ---
   if (['infected', 'dead', 'missing'].includes(currentHouse.status)) {
+    const npcName = currentHouse.npc?.name || 'Unknown'
+    let overlayText = ''
+
+    if (currentHouse.status === 'dead') {
+      overlayText = `${npcName}'s face is missing...`
+    } else if (currentHouse.status === 'missing') {
+      overlayText = `That looks like a summoning circle...`
+    } else if (currentHouse.status === 'infected') {
+      overlayText = `Something is wrong with ${npcName}...`
+    }
+
     return (
       <div className="infected-overlay" onClick={closeHouseMenu}>
-        {currentHouse.infectedImage && (
-          <img
-            src={currentHouse.infectedImage}
-            alt="Infected View"
-            className="infected-image-fullscreen"
-          />
-        )}
+        <div className="infected-content">
+          {currentHouse.infectedImage && (
+            <img
+              src={currentHouse.infectedImage}
+              alt="Infected View"
+              className="infected-image-fullscreen"
+            />
+          )}
+          {overlayText && (
+            <p className="infected-overlay-text">{overlayText}</p>
+          )}
+        </div>
       </div>
     )
   }
 
-  // --- Normal/Guard State ---
-  const npc = currentHouse.npc
-  if (!activeDialog) return null
-
-  const handleOptionClick = (option) => {
+  const handleOption = (option) => {
     if (option.action === 'sleep') {
-      sleep()
+      useGameStore.getState().sleep()
       return
     }
-
     if (option.action === 'eliminate') {
-      // Trigger elimination mode in store and close dialog
       useGameStore.getState().setEliminationMode(true)
       closeHouseMenu()
       return
     }
-
     if (option.action === 'close') {
       closeHouseMenu()
       return
     }
 
-    if (option.response) {
-      // Show response first
-      setCurrentResponseText(option.response)
-      setShowingResponse(true)
-      // Store where we go next (if any)
-      setPendingNextDialog(option.nextDialog || null)
-    } else if (option.nextDialog) {
-      // No response text, just jump to next dialog
-      setActiveDialog(option.nextDialog)
-    } else {
-      // No response, no next dialog -> Close? (Default behavior)
-      closeHouseMenu()
+    if (option.nextDialog) {
+      setCurrentNode(option.nextDialog)
+    } else if (option.response) {
+      setCurrentNode({ text: option.response, options: [{ label: "Close", action: "close" }] })
     }
   }
 
-  const handleContinue = () => {
-    setShowingResponse(false)
-    setCurrentResponseText(null)
+  const handleSendMessage = async (e) => {
+    e.preventDefault()
+    if (!chatInput.trim() || isLoading) return
 
-    if (pendingNextDialog) {
-      setActiveDialog(pendingNextDialog)
-      setPendingNextDialog(null)
+    const userMsg = chatInput
+    setChatHistory(prev => [...prev, { sender: 'user', text: userMsg }])
+    setChatInput('')
+    setIsLoading(true)
+
+    // Get character name (check day-specific override)
+    let charName = currentHouse.npc?.name || 'Unknown'
+    const dayKey = `day${cycle}`
+    if (currentHouse[dayKey]?.npc?.name) {
+      charName = currentHouse[dayKey].npc.name
+    }
+
+    // Call API with current day
+    const data = await gameApi.interrogate(sessionId, charName, userMsg, cycle)
+
+    setIsLoading(false)
+    if (data?.response) {
+      setChatHistory(prev => [...prev, { sender: 'npc', text: data.response }])
     } else {
-      // If no next dialog defined after a response, usually loop back or close?
-      // For this script, leaf nodes usually end conversation or provided interactions are explicit.
-      // If we are at a leaf with no nextDialog, we stay? No, the user script implies flow.
-      // If "Back" logic is needed, we'd need a history stack. 
-      // For now, if no next dialog, we close (as most options in script have nextDialog or are "Goodbye").
-      // Actually, looking at the script: "That's all" -> "Hope you..." -> End.
-      // So if no nextDialog, we close.
-      closeHouseMenu()
+      setChatHistory(prev => [...prev, { sender: 'system', text: "The spirits are silent..." }])
     }
   }
 
-  return (
-    <div className="conversation-overlay">
-      <div className="conversation-container">
-        {/* Left Side: Image */}
-        <div className="conversation-left">
-          {npc.portrait ? (
-            <img src={npc.portrait} alt={npc.name} className="npc-portrait-img" onError={(e) => e.target.style.display = 'none'} />
-          ) : (
-            <div className="conversation-image-placeholder">
-              {currentHouse.type === 'guard' ? '🛡️' : `🏠`}
-            </div>
-          )}
-        </div>
+  const npc = currentHouse.npc
+  const npcName = npc?.name || 'Unknown'
 
-        {/* Right Side: Dialogue & Options */}
-        <div className="conversation-right">
-          {/* Top: Name & Dialogue */}
-          <div className="conversation-header">
-            <h2 className="npc-name">{npc.name}</h2>
-            <div className="dialogue-box">
-              <p>
-                {showingResponse ? currentResponseText : activeDialog.text}
-              </p>
-            </div>
-          </div>
+  // Get the latest NPC response for display
+  const latestNpcMessage = chatHistory.filter(m => m.sender === 'npc').slice(-1)[0]?.text || "..."
 
-          {/* Bottom: Options */}
-          <div className="conversation-options">
-            {showingResponse ? (
-              <button className="option-button" onClick={handleContinue}>
-                Continue
-              </button>
+  // VILLAGER: Chat Interface with proper layout
+  if (isVillager) {
+    return (
+      <div className="conversation-overlay">
+        <div className="conversation-dialog-box">
+          {/* LEFT HALF: Character Portrait - FULL SIZE */}
+          <div className="dialog-left">
+            {npc?.portrait ? (
+              <img
+                src={npc.portrait}
+                alt={npcName}
+                className="dialog-portrait"
+                onError={(e) => e.target.style.display = 'none'}
+              />
             ) : (
-              activeDialog.options && activeDialog.options.map((option, index) => (
-                <button
-                  key={index}
-                  className="option-button"
-                  onClick={() => handleOptionClick(option)}
-                >
-                  {option.label}
-                </button>
-              ))
+              <div className="dialog-portrait-placeholder">
+                <span style={{ fontSize: '4rem' }}>🏠</span>
+              </div>
             )}
           </div>
+
+          {/* RIGHT HALF: Split vertically */}
+          <div className="dialog-right">
+            {/* TOP: NPC Response */}
+            <div className="dialog-response-area">
+              <h3 className="dialog-npc-name">{npcName}</h3>
+              <div className="dialog-response-text">
+                {isLoading ? (
+                  <em style={{ color: '#888' }}>Listening...</em>
+                ) : (
+                  <p>{latestNpcMessage}</p>
+                )}
+              </div>
+            </div>
+
+            {/* BOTTOM: Chat Input */}
+            <div className="dialog-input-area">
+              <form onSubmit={handleSendMessage} className="dialog-input-form">
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => e.stopPropagation()}
+                  placeholder="Type your question..."
+                  className="dialog-input"
+                  disabled={isLoading}
+                  autoFocus
+                />
+                <div className="dialog-buttons">
+                  <button type="submit" disabled={isLoading} className="dialog-btn dialog-btn-ask">
+                    Ask
+                  </button>
+                  <button type="button" onClick={closeHouseMenu} className="dialog-btn dialog-btn-leave">
+                    Leave
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // GUARD: Standard Dialog Options
+  return (
+    <div className="conversation-overlay">
+      <div className="conversation-box">
+        <h2 className="npc-name">{npcName}</h2>
+
+        <div className="dialog-text">
+          {currentNode?.text || "..."}
+        </div>
+
+        <div className="options-list">
+          {currentNode?.options?.map((option, index) => (
+            <button
+              key={index}
+              className="dialog-option"
+              onClick={() => handleOption(option)}
+            >
+              {option.label}
+            </button>
+          ))}
         </div>
       </div>
     </div>

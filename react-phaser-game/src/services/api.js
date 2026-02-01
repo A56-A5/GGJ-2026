@@ -1,0 +1,39 @@
+const API_BASE = 'http://127.0.0.1:5000/api'
+
+export const gameApi = {
+    // Create new session
+    createSession: async () => {
+        try {
+            const res = await fetch(`${API_BASE}/game/new`, { method: 'POST' })
+            return await res.json()
+        } catch (err) {
+            console.error('API Error:', err)
+            return null
+        }
+    },
+
+    // Interrogate character
+    interrogate: async (sessionId, character, message, day) => {
+        try {
+            const res = await fetch(`${API_BASE}/interrogate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ session_id: sessionId, character, message, day })
+            })
+            return await res.json()
+        } catch (err) {
+            console.error('API Error:', err)
+            return { response: "The wind howls... (Connection Error)" }
+        }
+    },
+
+    // Advance day (sync with backend)
+    advanceDay: async (sessionId) => {
+        try {
+            const res = await fetch(`${API_BASE}/game/${sessionId}/advance-day`, { method: 'POST' })
+            return await res.json()
+        } catch (err) {
+            console.error('API Error:', err)
+        }
+    }
+}

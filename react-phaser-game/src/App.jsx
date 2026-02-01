@@ -3,6 +3,7 @@ import { GameContainer } from './components/GameContainer'
 import { ConversationDialog } from './components/ConversationDialog'
 import { IntroScreen } from './components/IntroScreen'
 import { GameLogicOverlay } from './components/GameLogicOverlay'
+import { useGameStore } from './store/gameStore' // Added import for useGameStore
 import './App.css'
 import './components/Elimination.css' // Import elimination styles
 
@@ -11,6 +12,12 @@ import './components/Elimination.css' // Import elimination styles
  * Integrates Phaser game with React UI overlays
  */
 function App() {
+  const initSession = useGameStore(state => state.initSession)
+
+  React.useEffect(() => {
+    initSession()
+  }, [])
+
   return (
     <div className="app">
       <GameContainer />

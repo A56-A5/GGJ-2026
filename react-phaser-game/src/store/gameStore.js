@@ -9,14 +9,31 @@ const findRandomNormalHouse = (houses) => {
   return normalHouses[randomIndex]
 }
 
+import { gameApi } from '../services/api'
+
 export const useGameStore = create((set, get) => {
   return {
-    houses: JSON.parse(JSON.stringify(initialHouses)), // Deep copy to allow mutation
-    cycle: 1, // Day cycle
+    houses: JSON.parse(JSON.stringify(initialHouses)),
+    cycle: 1,
     isPaused: false,
-    currentHouse: null, // The house currently being interacted with
+    currentHouse: null,
+    sessionId: null, // Store backend session ID
 
     // Actions
+
+    // Initialize Game Session (call on App mount)
+    initSession: async () => {
+      const { sessionId } = get()
+      if (!sessionId) {
+        const data = await gameApi.createSession()
+        if (data && data.session_id) {
+          set({ sessionId: data.session_id })
+          console.log("Game Session Started:", data.session_id)
+        }
+      }
+    },
+
+    // Open house interaction
 
     // Open house interaction
     openHouseEvent: (houseId) => {
@@ -39,9 +56,14 @@ export const useGameStore = create((set, get) => {
     },
 
     // Sleep action (triggered from Guard House - Moves to Day 2)
-    sleep: () => {
-      const { houses, cycle } = get()
+    sleep: async () => {
+      const { houses, cycle, sessionId } = get()
       const nextCycle = cycle + 1
+
+      // Sync with backend
+      if (sessionId) {
+        gameApi.advanceDay(sessionId)
+      }
 
       let newHouses = houses.map(h => {
         const house = { ...h }
