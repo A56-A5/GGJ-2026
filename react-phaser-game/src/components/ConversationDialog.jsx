@@ -49,9 +49,9 @@ export function ConversationDialog() {
     let overlayText = ''
 
     if (currentHouse.status === 'dead') {
-      overlayText = `${npcName}'s face is missing...`
+      overlayText = `${npcName}'s face is missing. The body looks like it's been dead for more than one day. It seems the Rakshasa was pretending to be them just yesterday and managed to fool you...`
     } else if (currentHouse.status === 'missing') {
-      overlayText = `That looks like a summoning circle...`
+      overlayText = `(Kabir's House)\n\nTHAT LOOKS LIKE A SUMMONING CIRCLE!`
     } else if (currentHouse.status === 'infected') {
       overlayText = `Something is wrong with ${npcName}...`
     }

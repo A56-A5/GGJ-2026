@@ -201,6 +201,20 @@ const day3_house5_amar = createDialog("Two skins shed.", [
   { label: "Is it you?", response: "If it were me, you would already be dead." }
 ])
 
+// --- DAY 4 DIALOGUES ---
+
+const day4_house1_ishaan = createDialog("Is it you? Or is it me?", [
+  { label: "Amar is dead.", response: "The Elder... gone. We are the last two." },
+  { label: "One of us is the demon.", response: "I know. I've been watching you. Have you been watching me?" },
+  { label: "Investigate (Free Chat)", action: "chat" }
+])
+
+const day4_house2_anya = createDialog("The final test.", [
+  { label: "Only we remain.", response: "Yes. The Rakshasa is one of us now." },
+  { label: "How do we know who?", response: "We don't. That's the horror of it." },
+  { label: "Investigate (Free Chat)", action: "chat" }
+])
+
 export const houses = [
   {
     id: "house_corin",

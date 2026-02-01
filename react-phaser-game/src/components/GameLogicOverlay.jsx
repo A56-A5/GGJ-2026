@@ -4,7 +4,7 @@ import { FailScreen } from './FailScreen'
 import { WinScreen } from './WinScreen'
 
 export function GameLogicOverlay() {
-    const { houses, hasWon, hasLost, eliminationMode, eliminateVillager, setEliminationMode, endGameMessage } = useGameStore()
+    const { houses, hasWon, hasLost, eliminationMode, eliminateVillager, setEliminationMode, endGameMessage, cycle } = useGameStore()
 
     if (hasWon) {
         return <WinScreen message={endGameMessage} />
@@ -15,12 +15,12 @@ export function GameLogicOverlay() {
     }
 
     // Count survivors (normal villagers)
-    // User said: "fail screen if there is only 2 house left without being infected / dead"
-    // So if normal_count <= 2
     const normalCount = houses.filter(h => h.type === 'villager' && h.status === 'normal').length
 
-    if (normalCount <= 2 && !hasWon) {
-        return <FailScreen />
+    // Fail if only 1 or 0 survivors remain (Day 4 allows 2 survivors - final showdown)
+    // OR if we're past Day 4 and still have 2+ survivors (shouldn't happen but safety check)
+    if ((normalCount <= 1 && !hasWon) || (cycle > 4 && normalCount >= 2)) {
+        return <FailScreen message="The Rakshasa has won. The village is lost." />
     }
 
     // Elimination UI Overlay
