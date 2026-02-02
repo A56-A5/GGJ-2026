@@ -436,7 +436,40 @@ Example:
         return speech, clue
     except Exception as e:
         print(f"LLM Error: {e}")
-        return "I... I cannot speak right now. (Server Error)", None
+        
+        # FALLBACK: Return pre-written responses when API fails
+        fallback_responses = {
+            "Ishaan the Miller": {
+                1: ("Kabir was acting strange, bhai. Listening to voices in the wind. |||JOURNAL: Kabir heard voices.", "Kabir heard voices."),
+                2: ("Vikram is dead! The strongest of us... if he can die, we're all doomed! |||JOURNAL: Vikram was strongest.", "Vikram was strongest."),
+                3: ("Diya... she was just a girl. Why her? The demon is among us! |||JOURNAL: Diya was innocent.", "Diya was innocent."),
+                4: ("Is it you? Or is it me? I don't know who to trust anymore! |||JOURNAL: Final two remain.", "Final two remain.")
+            },
+            "Anya the Herbalist": {
+                1: ("Kabir spoke of shedding his skin. His soul was troubled, ji. |||JOURNAL: Kabir's troubled soul.", "Kabir's troubled soul."),
+                2: ("Vikram's wounds... not from an animal. Inhuman strength. |||JOURNAL: Inhuman strength used.", "Inhuman strength used."),
+                3: ("Diya saw someone walking wrong. The Rakshasa mimics poorly. |||JOURNAL: Rakshasa mimics poorly.", "Rakshasa mimics poorly."),
+                4: ("One of us is the demon. I've prepared poison, just in case. |||JOURNAL: Anya has poison.", "Anya has poison.")
+            },
+            "Vikram the Hunter": {
+                1: ("Kabir was stalking houses like prey. I should've put an arrow in him. |||JOURNAL: Kabir stalked houses.", "Kabir stalked houses.")
+            },
+            "Diya the Weaver": {
+                1: ("Kabir asked when guards change. His eyes were empty, like a doll. |||JOURNAL: Kabir's empty eyes.", "Kabir's empty eyes."),
+                2: ("I feel much better today! The fear is gone somehow. |||JOURNAL: Diya suspiciously calm.", "Diya suspiciously calm.")
+            },
+            "Amar the Elder": {
+                1: ("This is a Rakshasa, child. It wears the skin of its victims. |||JOURNAL: Rakshasa steals skin.", "Rakshasa steals skin."),
+                2: ("The dead walk among us. Who acted strange yesterday? |||JOURNAL: Dead walk among us.", "Dead walk among us."),
+                3: ("I saw the sunrise today... I mean, I felt its warmth. |||JOURNAL: Amar claims to see.", "Amar claims to see.")
+            }
+        }
+        
+        # Get fallback response
+        if character in fallback_responses and day in fallback_responses[character]:
+            return fallback_responses[character][day]
+        else:
+            return f"I... I cannot speak right now. (API Error - Get new key at openrouter.ai)", None
 
 
 # =====================
