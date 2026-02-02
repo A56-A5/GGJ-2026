@@ -10,7 +10,7 @@ export default function Sidebar() {
     useEffect(() => {
         const fetchJournal = async () => {
             try {
-                const res = await fetch('https://ggj-2026.onrender.com/api/journal')
+                const res = await fetch('https://ggj-2026.onrender.com/journal')
                 const data = await res.json()
                 if (data.entries) {
                     setFileEntries(data.entries)
