@@ -10,7 +10,7 @@ export default function Sidebar() {
     useEffect(() => {
         const fetchJournal = async () => {
             try {
-                const res = await fetch('https://a1vi.pythonanywhere.com/journal')
+                const res = await fetch('https://a1vi.pythonanywhere.com/api/journal')
                 const data = await res.json()
                 if (data.entries) {
                     setFileEntries(data.entries)

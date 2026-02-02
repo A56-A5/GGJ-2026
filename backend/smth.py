@@ -476,7 +476,7 @@ Example:
 # API ENDPOINTS
 # =====================
 
-@app.route('/api/game/new', methods=['POST'])
+@app.route('/game/new', methods=['POST'])
 def new_game():
     """Create a new game session"""
     session_id = str(uuid.uuid4())
@@ -496,7 +496,7 @@ def new_game():
         "message": "New game started"
     })
 
-@app.route('/api/interrogate', methods=['POST'])
+@app.route('/interrogate', methods=['POST'])
 def interrogate():
     """Interrogate a character"""
     data = request.json
@@ -550,7 +550,7 @@ def interrogate():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route('/api/journal', methods=['GET'])
+@app.route('/journal', methods=['GET'])
 def get_journal():
     lines = read_journal()
     return jsonify({"entries": lines})
@@ -558,7 +558,7 @@ def get_journal():
 
 
 
-@app.route('/api/game/<session_id>/advance-day', methods=['POST'])
+@app.route('/game/<session_id>/advance-day', methods=['POST'])
 def advance_day(session_id):
     """Advance to the next day"""
     if session_id not in game_sessions:
@@ -581,7 +581,7 @@ def advance_day(session_id):
         "message": f"Advanced to day {session.current_day}"
     })
 
-@app.route('/api/game/<session_id>/eliminate', methods=['POST'])
+@app.route('/game/<session_id>/eliminate', methods=['POST'])
 def eliminate_suspect(session_id):
     """Try to eliminate a suspect. ONE GUESS RULE."""
     data = request.json

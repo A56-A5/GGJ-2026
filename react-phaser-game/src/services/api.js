@@ -4,7 +4,7 @@ export const gameApi = {
     // Create new session
     createSession: async () => {
         try {
-            const res = await fetch(`${API_BASE}/game/new`, { method: 'POST' })
+            const res = await fetch(`${API_BASE}/api/game/new`, { method: 'POST' })
             return await res.json()
         } catch (err) {
             console.error('API Error:', err)
@@ -15,7 +15,7 @@ export const gameApi = {
     // Interrogate character
     interrogate: async (sessionId, character, message, day) => {
         try {
-            const res = await fetch(`${API_BASE}/interrogate`, {
+            const res = await fetch(`${API_BASE}/api/interrogate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ session_id: sessionId, character, message, day })
@@ -30,7 +30,7 @@ export const gameApi = {
     // Advance day (sync with backend)
     advanceDay: async (sessionId) => {
         try {
-            const res = await fetch(`${API_BASE}/game/${sessionId}/advance-day`, { method: 'POST' })
+            const res = await fetch(`${API_BASE}/api/game/${sessionId}/advance-day`, { method: 'POST' })
             return await res.json()
         } catch (err) {
             console.error('API Error:', err)
@@ -40,7 +40,7 @@ export const gameApi = {
     // Eliminate suspect
     eliminate: async (sessionId, character) => {
         try {
-            const res = await fetch(`${API_BASE}/game/${sessionId}/eliminate`, {
+            const res = await fetch(`${API_BASE}/api/game/${sessionId}/eliminate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ character })
