@@ -8,7 +8,7 @@
 
 **Built in 48 hours for Global Game Jam 2026**
 
-[Play Now](#installation) • [About](#about) • [Features](#features) • [Tech Stack](#tech-stack)
+[Play Now](https://ggj-2026.vercel.app/) • [About](#about) • [Features](#features) • [Tech Stack](#tech-stack)
 
 </div>
 
