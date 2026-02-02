@@ -28,7 +28,7 @@ client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
     api_key=api_key,
     default_headers={
-        "HTTP-Referer": "http://localhost:5000",
+        "HTTP-Referer": "https://a1vi.pythonanywhere.com",
         "X-Title": "The last face"
     }
 )

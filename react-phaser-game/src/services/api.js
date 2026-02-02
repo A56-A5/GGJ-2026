@@ -1,4 +1,4 @@
-const API_BASE = 'https://ggj-2026.onrender.com'
+const API_BASE = 'https://a1vi.pythonanywhere.com'
 
 export const gameApi = {
     // Create new session
